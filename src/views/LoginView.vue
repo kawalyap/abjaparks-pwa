@@ -12,10 +12,10 @@ const pin = ref('')
 const error = ref<string | null>(null)
 
 const terminals = [
-  { id: 'POS-01', name: 'Main Gate 1', icon: 'fa-door-open', badge: 'Active' },
-  { id: 'POS-02', name: 'Main Gate 2', icon: 'fa-truck-ramp-box', badge: 'Standby' },
-  { id: 'POS-03', name: 'VIP Entrance', icon: 'fa-crown', badge: 'VIP Only' },
-  { id: 'POS-04', name: 'Poolside & Garden', icon: 'fa-water-ladder', badge: 'Outdoor' },
+  { id: 'POS-01', name: 'Main Gate 1', icon: 'fa-door-open' },
+  { id: 'POS-02', name: 'Main Gate 2', icon: 'fa-truck-ramp-box' },
+  { id: 'POS-03', name: 'VIP Entrance', icon: 'fa-crown' },
+  { id: 'POS-04', name: 'Poolside & Garden', icon: 'fa-water-ladder' },
 ]
 
 const quickAttendants = ['Sarah K.', 'John M.', 'Grace N.', 'David O.']
@@ -48,95 +48,78 @@ function handleLogin() {
 </script>
 
 <template>
-  <div class="pos-container py-4 px-3 max-w-md mx-auto">
-    <div class="bg-white border border-[#E8E6E1] rounded-2xl shadow-xl overflow-hidden">
+  <div class="pos-container login-page">
+    <div class="login-card">
       <!-- Premium Abja Brand Header -->
-      <div class="bg-gradient-to-b from-[#1C2331] via-[#1E2738] to-[#121722] text-white p-6 text-center relative border-b-2 border-[#9E8F70]">
-        <div class="inline-flex items-center justify-center bg-white px-4 py-2 rounded-xl shadow-md mb-3">
-          <img src="/abja-logo.png" alt="Abja Parks" class="h-8 w-auto object-contain" />
+      <div class="login-header">
+        <div class="brand-badge">
+          <img src="/abja-logo.png" alt="Abja Parks" class="brand-logo" />
         </div>
-        <h1 class="text-base font-black tracking-tight text-white uppercase">POS Terminal Station</h1>
-        <p class="text-xs text-[#D4C7AC] mt-0.5 font-semibold">Cashier Shift & Gate Register Setup</p>
+        <h1 class="header-title">POS Terminal Station</h1>
+        <p class="header-sub">Cashier Shift & Gate Register Setup</p>
 
         <!-- Status indicator -->
-        <div class="inline-flex items-center gap-1.5 bg-[#9E8F70]/20 border border-[#9E8F70]/40 px-2.5 py-1 rounded-full text-[10px] font-bold text-[#EFECE6] mt-3">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          YoTicket Gateway Connected
+        <div class="gateway-badge">
+          <span class="live-dot"></span>
+          <span>YoTicket Gateway Connected</span>
         </div>
       </div>
 
       <!-- Form Body -->
-      <form @submit.prevent="handleLogin" class="p-5 space-y-4">
+      <form @submit.prevent="handleLogin" class="login-body">
         <!-- Error Alert -->
-        <div v-if="error" class="bg-rose-50 text-rose-700 text-xs font-bold p-3 rounded-xl border border-rose-200 flex items-center gap-2">
+        <div v-if="error" class="error-alert">
           <i class="fa-solid fa-circle-exclamation shrink-0"></i>
           <span>{{ error }}</span>
         </div>
 
         <!-- Terminal / Station Selector Grid -->
-        <div>
-          <label class="block text-xs font-black uppercase tracking-wider text-[#1C2331] mb-2 flex items-center justify-between">
-            <span>Terminal Station</span>
-            <span class="text-[10px] font-bold text-[#9E8F70] lowercase">{{ terminalId }}</span>
-          </label>
-          <div class="grid grid-cols-2 gap-2">
+        <div class="form-group">
+          <div class="group-header">
+            <span class="field-label">Terminal Station</span>
+            <span class="selected-id">{{ terminalId }}</span>
+          </div>
+          <div class="terminal-grid">
             <button
               v-for="t in terminals"
               :key="t.id"
               type="button"
               @click="selectTerminal(t.id)"
-              class="p-2.5 rounded-xl border text-left transition flex flex-col justify-between"
-              :class="[
-                terminalId === t.id
-                  ? 'bg-[#1C2331] text-white border-[#1C2331] shadow-md ring-2 ring-[#9E8F70]'
-                  : 'bg-[#F8F7F4] text-[#1C2331] border-[#E8E6E1] hover:border-[#9E8F70]/60'
-              ]"
+              class="terminal-tile"
+              :class="{ active: terminalId === t.id }"
             >
-              <div class="flex items-center justify-between w-full mb-1">
-                <i :class="['fa-solid', t.icon, terminalId === t.id ? 'text-[#D4C7AC]' : 'text-[#9E8F70]']"></i>
-                <span
-                  class="text-[9px] font-black uppercase px-1.5 py-0.5 rounded"
-                  :class="[
-                    terminalId === t.id ? 'bg-[#9E8F70]/30 text-[#EFECE6]' : 'bg-slate-200/70 text-slate-600'
-                  ]"
-                >
-                  {{ t.id }}
-                </span>
+              <div class="tile-top">
+                <i :class="['fa-solid', t.icon, 'tile-icon']"></i>
+                <span class="tile-id">{{ t.id }}</span>
               </div>
-              <div class="text-xs font-bold tracking-tight leading-tight">{{ t.name }}</div>
+              <div class="tile-name">{{ t.name }}</div>
             </button>
           </div>
         </div>
 
         <!-- Attendant / Cashier Name -->
-        <div>
-          <label class="block text-xs font-black uppercase tracking-wider text-[#1C2331] mb-1.5">
-            Attendant / Cashier Name
-          </label>
-          <div class="relative mb-2">
-            <i class="fa-solid fa-user absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+        <div class="form-group">
+          <label class="field-label">Attendant / Cashier Name</label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-user input-icon"></i>
             <input
               v-model="agentName"
               type="text"
               required
               placeholder="e.g. Sarah / John"
-              class="w-full pl-8 pr-3 py-2.5 text-xs font-bold bg-[#F8F7F4] text-[#1C2331] border border-[#E8E6E1] rounded-xl focus:bg-white focus:ring-2 focus:ring-[#9E8F70] focus:border-transparent outline-none transition"
+              class="text-input"
             />
           </div>
 
           <!-- Quick Name Chips -->
-          <div class="flex flex-wrap gap-1.5">
+          <div class="chips-row">
             <button
               v-for="name in quickAttendants"
               :key="name"
               type="button"
               @click="selectAttendant(name)"
-              class="text-[10px] font-bold px-2 py-1 rounded-lg border transition"
-              :class="[
-                agentName === name
-                  ? 'bg-[#9E8F70] text-white border-[#9E8F70]'
-                  : 'bg-[#F8F7F4] text-slate-600 border-[#E8E6E1] hover:bg-slate-100'
-              ]"
+              class="chip-tag"
+              :class="{ active: agentName === name }"
             >
               {{ name }}
             </button>
@@ -144,13 +127,13 @@ function handleLogin() {
         </div>
 
         <!-- Security PIN (Numeric Keyboard) -->
-        <div>
-          <label class="block text-xs font-black uppercase tracking-wider text-[#1C2331] mb-1.5 flex items-center justify-between">
-            <span>Shift PIN (Optional)</span>
-            <span class="text-[10px] font-normal text-slate-400">4 Digits</span>
-          </label>
-          <div class="relative">
-            <i class="fa-solid fa-shield-halved absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+        <div class="form-group">
+          <div class="group-header">
+            <span class="field-label">Shift PIN (Optional)</span>
+            <span class="hint-text">4 Digits</span>
+          </div>
+          <div class="input-wrap">
+            <i class="fa-solid fa-shield-halved input-icon"></i>
             <input
               v-model="pin"
               type="password"
@@ -158,32 +141,341 @@ function handleLogin() {
               pattern="[0-9]*"
               maxlength="4"
               placeholder="••••"
-              class="w-full pl-8 pr-3 py-2.5 text-xs font-mono tracking-widest bg-[#F8F7F4] text-[#1C2331] border border-[#E8E6E1] rounded-xl focus:bg-white focus:ring-2 focus:ring-[#9E8F70] focus:border-transparent outline-none transition"
+              class="text-input pin-input"
             />
           </div>
         </div>
 
         <!-- Primary Action Button -->
-        <button
-          type="submit"
-          class="w-full py-3.5 bg-[#9E8F70] hover:bg-[#8B7C5E] active:scale-98 text-[#1C2331] text-xs font-black uppercase tracking-wider rounded-xl shadow-md transition flex items-center justify-center gap-2"
-        >
-          <i class="fa-solid fa-arrow-right-to-bracket text-sm"></i>
+        <button type="submit" class="primary-btn">
+          <i class="fa-solid fa-arrow-right-to-bracket"></i>
           <span>Start Shift & Open Register</span>
         </button>
 
         <!-- Peripheral & System Status -->
-        <div class="pt-2 border-t border-[#E8E6E1] flex items-center justify-between text-[10px] text-slate-500 font-semibold">
-          <span class="flex items-center gap-1.5">
-            <i class="fa-solid fa-print text-[#9E8F70]"></i>
-            58mm ESC/POS Ready
+        <div class="footer-status">
+          <span class="status-item">
+            <i class="fa-solid fa-print"></i>
+            <span>58mm ESC/POS Ready</span>
           </span>
-          <span class="flex items-center gap-1.5">
-            <i class="fa-solid fa-wifi text-emerald-600"></i>
-            Cloud Sync Active
+          <span class="status-item">
+            <i class="fa-solid fa-wifi text-online"></i>
+            <span>Cloud Sync Active</span>
           </span>
         </div>
       </form>
     </div>
   </div>
 </template>
+
+<style scoped>
+.login-page {
+  padding-top: 16px;
+  padding-bottom: 24px;
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+.login-card {
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--border, #E8E6E1);
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(28, 35, 49, 0.08);
+  overflow: hidden;
+}
+
+.login-header {
+  background: linear-gradient(180deg, #1C2331 0%, #171E2B 100%);
+  color: #ffffff;
+  padding: 24px 20px;
+  text-align: center;
+  border-bottom: 2px solid var(--accent, #9E8F70);
+}
+
+.brand-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  padding: 6px 14px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  margin-bottom: 10px;
+}
+
+.brand-logo {
+  height: 30px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.header-title {
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin: 0;
+}
+
+.header-sub {
+  font-size: 11px;
+  color: #D4C7AC;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.gateway-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(158, 143, 112, 0.2);
+  border: 1px solid rgba(158, 143, 112, 0.4);
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #EFECE6;
+  margin-top: 12px;
+}
+
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #34d399;
+}
+
+.login-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.error-alert {
+  background: #fff1f2;
+  color: #be123c;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid #fecdd3;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.field-label {
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-main, #1C2331);
+}
+
+.selected-id {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--accent, #9E8F70);
+}
+
+.hint-text {
+  font-size: 10px;
+  color: #94a3b8;
+}
+
+.terminal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.terminal-tile {
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid var(--border, #E8E6E1);
+  background: var(--bg-app, #F8F7F4);
+  color: var(--text-main, #1C2331);
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.terminal-tile:hover {
+  border-color: rgba(158, 143, 112, 0.6);
+}
+
+.terminal-tile.active {
+  background: #1C2331;
+  color: #ffffff;
+  border-color: #1C2331;
+  box-shadow: 0 4px 12px rgba(28, 35, 49, 0.2);
+  outline: 2px solid var(--accent, #9E8F70);
+}
+
+.tile-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tile-icon {
+  font-size: 12px;
+  color: var(--accent, #9E8F70);
+}
+
+.terminal-tile.active .tile-icon {
+  color: #D4C7AC;
+}
+
+.tile-id {
+  font-size: 9px;
+  font-weight: 900;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.08);
+  color: #64748b;
+}
+
+.terminal-tile.active .tile-id {
+  background: rgba(158, 143, 112, 0.35);
+  color: #EFECE6;
+}
+
+.tile-name {
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 12px;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.text-input {
+  width: 100%;
+  padding: 10px 12px 10px 34px;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--bg-app, #F8F7F4);
+  color: var(--text-main, #1C2331);
+  border: 1px solid var(--border, #E8E6E1);
+  border-radius: 12px;
+  outline: none;
+  transition: all 0.15s ease;
+}
+
+.text-input:focus {
+  background: #ffffff;
+  border-color: var(--accent, #9E8F70);
+  box-shadow: 0 0 0 3px rgba(158, 143, 112, 0.2);
+}
+
+.pin-input {
+  letter-spacing: 0.3em;
+  font-family: monospace;
+}
+
+.chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.chip-tag {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border, #E8E6E1);
+  background: var(--bg-app, #F8F7F4);
+  color: #64748b;
+  transition: all 0.15s ease;
+}
+
+.chip-tag:hover {
+  background: #f1f5f9;
+}
+
+.chip-tag.active {
+  background: var(--accent, #9E8F70);
+  color: #ffffff;
+  border-color: var(--accent, #9E8F70);
+}
+
+.primary-btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--accent, #9E8F70);
+  color: #1C2331;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(158, 143, 112, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.15s ease;
+}
+
+.primary-btn:hover {
+  background: #8B7C5E;
+  color: #ffffff;
+}
+
+.footer-status {
+  padding-top: 10px;
+  border-top: 1px solid var(--border, #E8E6E1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 10px;
+  color: #64748b;
+  font-weight: 700;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.status-item i {
+  color: var(--accent, #9E8F70);
+}
+
+.text-online {
+  color: #16a34a !important;
+}
+</style>

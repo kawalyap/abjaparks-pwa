@@ -1,6 +1,16 @@
+@import "tailwindcss";
 @import '@astryxdesign/theme-neutral/theme.css';
 @import '@astryxdesign/theme-stone/theme.css';
-@import "tailwindcss";
+
+@theme {
+  --color-primary: #1C2331;
+  --color-primary-dark: #121722;
+  --color-primary-light: #F4F2EE;
+  --color-accent: #9E8F70;
+  --color-accent-hover: #8B7C5E;
+  --color-accent-light: #F7F5F1;
+  --color-accent-gold: #B5A585;
+}
 
 :root, [data-astryx-theme] {
   /* Meta Astryx Design System Radii */
@@ -17,7 +27,7 @@
   --ax-shadow-hover: var(--shadow-inset-hover, inset 0 0 0 2px rgba(158, 143, 112, 0.35));
   --ax-shadow-focus: var(--shadow-inset-selected, inset 0 0 0 2px #9E8F70);
 
-  /* Official Abja Parks Brand Colors (Extracted from Brand Logo) */
+  /* Official Abja Parks Brand Colors */
   --primary: #1C2331;         /* Abja Dark Charcoal Slate */
   --primary-dark: #121722;    /* Deep Midnight Slate */
   --primary-light: #F4F2EE;   /* Soft Sand White */
@@ -36,6 +46,15 @@
   --text-muted: #6B7280;
   --border: #E8E6E1;
   --border-strong: #D5D1C7;
+}
+
+/* Global Container */
+.pos-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 12px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Astryx Design System Utility Tokens */

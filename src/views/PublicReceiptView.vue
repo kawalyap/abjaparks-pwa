@@ -80,119 +80,119 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="max-w-md mx-auto py-6 px-3">
+  <div class="public-receipt-wrapper">
     <!-- Loading -->
-    <div v-if="isLoading" class="py-20 text-center text-slate-400">
-      <i class="fa-solid fa-circle-notch fa-spin text-3xl text-[#9E8F70] mb-3"></i>
-      <p class="text-xs font-bold text-slate-700">Verifying Official Entry Receipt...</p>
+    <div v-if="isLoading" class="state-box">
+      <i class="fa-solid fa-circle-notch fa-spin state-icon"></i>
+      <p class="state-text">Verifying Official Entry Receipt...</p>
     </div>
 
     <!-- Error -->
-    <div v-else-if="errorMessage" class="bg-white border border-rose-200 rounded-3xl p-8 text-center shadow-lg">
-      <div class="w-14 h-14 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mx-auto mb-3">
-        <i class="fa-solid fa-triangle-exclamation text-2xl"></i>
+    <div v-else-if="errorMessage" class="error-box">
+      <div class="error-icon-circle">
+        <i class="fa-solid fa-triangle-exclamation"></i>
       </div>
-      <h2 class="text-base font-black text-[#1C2331]">Receipt Not Found</h2>
-      <p class="text-xs text-slate-500 mt-1">{{ errorMessage }}</p>
+      <h2 class="error-title">Receipt Not Found</h2>
+      <p class="error-desc">{{ errorMessage }}</p>
     </div>
 
     <!-- Official Verified Receipt Card -->
-    <div v-else-if="receipt" class="bg-white border border-[#E8E6E1] rounded-3xl shadow-xl overflow-hidden">
+    <div v-else-if="receipt" class="verified-card">
       <!-- Verified Top Header -->
-      <div class="bg-gradient-to-b from-[#1C2331] via-[#1E2738] to-[#121722] text-white p-5 text-center relative border-b-2 border-[#9E8F70]">
-        <div class="bg-white rounded-xl px-3.5 py-1.5 inline-block mx-auto mb-2 shadow-sm">
-          <img src="/abja-logo.png" alt="Abja Parks" class="h-7 mx-auto object-contain" />
+      <div class="verified-header">
+        <div class="verified-logo-wrap">
+          <img src="/abja-logo.png" alt="Abja Parks" class="verified-logo" />
         </div>
-        <p class="text-xs text-[#D4C7AC] font-bold">Official Admission E-Receipt</p>
+        <p class="verified-sub">Official Admission E-Receipt</p>
 
         <!-- Verified badge -->
-        <div class="inline-flex items-center gap-1.5 bg-[#9E8F70]/20 border border-[#9E8F70]/40 px-3 py-1 rounded-full text-[10px] font-black uppercase text-[#EFECE6] mt-2 tracking-wider">
-          <i class="fa-solid fa-circle-check text-emerald-400"></i>
-          Verified Official Payment
+        <div class="verified-pill">
+          <i class="fa-solid fa-circle-check"></i>
+          <span>Verified Official Payment</span>
         </div>
       </div>
 
       <!-- Content -->
-      <div class="p-5 space-y-4">
+      <div class="verified-body">
         <!-- Scannable Gate Verification QR -->
-        <div class="text-center bg-[#F8F7F4] border border-[#E8E6E1] rounded-2xl p-4">
-          <div class="text-[10px] uppercase font-black text-slate-400 tracking-wider mb-2">Gate Scan & Verification</div>
-          <div v-if="qrDataUrl" class="inline-block p-2 bg-white rounded-xl shadow-xs border border-[#E8E6E1]">
-            <img :src="qrDataUrl" alt="Verification QR" class="w-36 h-36 mx-auto object-contain" />
+        <div class="gate-qr-box">
+          <div class="gate-qr-title">Gate Scan & Verification</div>
+          <div v-if="qrDataUrl" class="gate-qr-frame">
+            <img :src="qrDataUrl" alt="Verification QR" class="gate-qr-img" />
           </div>
-          <div class="mt-2 text-xs font-mono font-black text-[#1C2331]">
+          <div class="gate-ticket-code">
             Ticket: {{ receipt.ticket_code }}
           </div>
-          <div class="text-[10px] text-slate-400 font-medium">Present this QR code or receipt number at the turnstile</div>
+          <div class="gate-instruction">Present this QR code or receipt number at the turnstile</div>
         </div>
 
         <!-- Receipt Metadata -->
-        <div class="bg-[#F8F7F4] border border-[#E8E6E1] rounded-2xl p-3.5 space-y-2 text-xs">
-          <div class="flex justify-between text-slate-500 font-medium">
+        <div class="receipt-meta-box">
+          <div class="meta-item">
             <span>Receipt No.</span>
-            <span class="font-mono font-bold text-[#1C2331]">#{{ receipt.receipt_number }}</span>
+            <span class="meta-val font-mono">#{{ receipt.receipt_number }}</span>
           </div>
-          <div class="flex justify-between text-slate-500 font-medium">
+          <div class="meta-item">
             <span>Category</span>
-            <span class="font-bold text-[#1C2331]">{{ receipt.category_name }}</span>
+            <span class="meta-val">{{ receipt.category_name }}</span>
           </div>
-          <div class="flex justify-between text-slate-500 font-medium">
+          <div class="meta-item">
             <span>Admissions / Quantity</span>
-            <span class="font-bold text-[#1C2331]">{{ receipt.quantity }} Person(s)</span>
+            <span class="meta-val">{{ receipt.quantity }} Person(s)</span>
           </div>
-          <div class="flex justify-between text-slate-500 font-medium">
+          <div class="meta-item">
             <span>MoMo Payer</span>
-            <span class="font-mono font-bold text-[#1C2331]">{{ receipt.momo_number }}</span>
+            <span class="meta-val font-mono">{{ receipt.momo_number }}</span>
           </div>
-          <div v-if="receipt.customer_name" class="flex justify-between text-slate-500 font-medium">
+          <div v-if="receipt.customer_name" class="meta-item">
             <span>Customer</span>
-            <span class="font-bold text-[#1C2331]">{{ receipt.customer_name }}</span>
+            <span class="meta-val">{{ receipt.customer_name }}</span>
           </div>
-          <div class="flex justify-between text-slate-500 font-medium">
+          <div class="meta-item">
             <span>Issued Date</span>
-            <span class="font-bold text-[#1C2331]">{{ receipt.issued_at }}</span>
+            <span class="meta-val">{{ receipt.issued_at }}</span>
           </div>
 
-          <div class="pt-2 border-t border-[#E8E6E1] flex justify-between items-center">
-            <span class="font-black text-slate-700 uppercase text-[11px]">Total Paid</span>
-            <span class="font-black text-[#1C2331] text-base">{{ formatCurrency(receipt.total_amount) }}</span>
+          <div class="meta-total-row">
+            <span>Total Paid</span>
+            <span class="meta-total-val">{{ formatCurrency(receipt.total_amount) }}</span>
           </div>
         </div>
 
         <!-- Email Copy Option -->
-        <div class="border-t border-[#E8E6E1] pt-3 space-y-1.5">
-          <label class="block text-[11px] font-black uppercase tracking-wider text-[#1C2331]">
+        <div class="email-section">
+          <label class="email-section-label">
             Send a copy to your email
           </label>
-          <div class="flex gap-1.5">
+          <div class="email-row">
             <input
               v-model="emailInput"
               type="email"
               placeholder="your-email@example.com"
-              class="flex-1 px-3 py-2 text-xs border border-[#E8E6E1] rounded-xl focus:ring-2 focus:ring-[#9E8F70] outline-none"
+              class="email-text-box"
             />
             <button
               @click="sendEmailReceipt"
               :disabled="isSendingEmail"
-              class="px-3.5 py-2 text-xs font-black text-[#1C2331] bg-[#9E8F70] hover:bg-[#8B7C5E] rounded-xl shadow-xs disabled:opacity-50 transition flex items-center gap-1.5"
+              class="email-submit-btn"
             >
               <i v-if="isSendingEmail" class="fa-solid fa-spinner fa-spin"></i>
               <i v-else class="fa-solid fa-envelope"></i>
               <span>Send</span>
             </button>
           </div>
-          <p v-if="emailFeedback" class="text-[10px] font-bold text-emerald-700">
+          <p v-if="emailFeedback" class="email-feedback-msg">
             {{ emailFeedback }}
           </p>
         </div>
 
         <!-- Footer / Print -->
-        <div class="pt-1">
+        <div class="print-footer">
           <button
             onclick="window.print()"
-            class="w-full py-2.5 bg-[#F8F7F4] hover:bg-slate-100 text-[#1C2331] border border-[#E8E6E1] text-xs font-black uppercase tracking-wider rounded-xl transition flex items-center justify-center gap-2"
+            class="print-pdf-btn"
           >
-            <i class="fa-solid fa-print text-[#9E8F70]"></i>
+            <i class="fa-solid fa-print"></i>
             <span>Print / Save PDF</span>
           </button>
         </div>
@@ -200,3 +200,301 @@ onMounted(() => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.public-receipt-wrapper {
+  max-width: 440px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.state-box {
+  padding: 80px 20px;
+  text-align: center;
+  color: #94a3b8;
+}
+
+.state-icon {
+  font-size: 28px;
+  color: var(--accent, #9E8F70);
+  margin-bottom: 12px;
+}
+
+.state-text {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-main, #1C2331);
+}
+
+.error-box {
+  background: #ffffff;
+  border: 1px solid #fecdd3;
+  border-radius: 20px;
+  padding: 30px 20px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+}
+
+.error-icon-circle {
+  width: 48px;
+  height: 48px;
+  background: #fff1f2;
+  color: #e11d48;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  margin: 0 auto 12px;
+}
+
+.error-title {
+  font-size: 15px;
+  font-weight: 900;
+  color: var(--text-main, #1C2331);
+  margin: 0;
+}
+
+.error-desc {
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+.verified-card {
+  background: #ffffff;
+  border: 1px solid var(--border, #E8E6E1);
+  border-radius: 24px;
+  box-shadow: 0 12px 30px rgba(28, 35, 49, 0.1);
+  overflow: hidden;
+}
+
+.verified-header {
+  background: linear-gradient(180deg, #1C2331 0%, #171E2B 100%);
+  color: #ffffff;
+  padding: 20px;
+  text-align: center;
+  border-bottom: 2px solid var(--accent, #9E8F70);
+}
+
+.verified-logo-wrap {
+  display: inline-block;
+  background: #ffffff;
+  padding: 5px 12px;
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
+
+.verified-logo {
+  height: 26px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.verified-sub {
+  font-size: 11px;
+  color: #D4C7AC;
+  font-weight: 700;
+  margin: 0;
+}
+
+.verified-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(158, 143, 112, 0.2);
+  border: 1px solid rgba(158, 143, 112, 0.4);
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #EFECE6;
+  margin-top: 8px;
+  letter-spacing: 0.03em;
+}
+
+.verified-pill i {
+  color: #34d399;
+}
+
+.verified-body {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.gate-qr-box {
+  background: var(--bg-app, #F8F7F4);
+  border: 1px solid var(--border, #E8E6E1);
+  border-radius: 16px;
+  padding: 16px;
+  text-align: center;
+}
+
+.gate-qr-title {
+  font-size: 9px;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #94a3b8;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.gate-qr-frame {
+  display: inline-block;
+  padding: 8px;
+  background: #ffffff;
+  border: 1px solid var(--border, #E8E6E1);
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.gate-qr-img {
+  width: 140px;
+  height: 140px;
+  object-fit: contain;
+  display: block;
+}
+
+.gate-ticket-code {
+  font-size: 12px;
+  font-family: monospace;
+  font-weight: 900;
+  color: var(--text-main, #1C2331);
+  margin-top: 8px;
+}
+
+.gate-instruction {
+  font-size: 10px;
+  color: #94a3b8;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.receipt-meta-box {
+  background: var(--bg-app, #F8F7F4);
+  border: 1px solid var(--border, #E8E6E1);
+  border-radius: 16px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.meta-item {
+  display: flex;
+  justify-content: space-between;
+  color: #64748b;
+}
+
+.meta-val {
+  font-weight: 800;
+  color: var(--text-main, #1C2331);
+}
+
+.meta-total-row {
+  padding-top: 8px;
+  margin-top: 4px;
+  border-top: 1px dashed #cbd5e1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.meta-total-val {
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--text-main, #1C2331);
+}
+
+.email-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.email-section-label {
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: var(--text-main, #1C2331);
+}
+
+.email-row {
+  display: flex;
+  gap: 6px;
+}
+
+.email-text-box {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 12px;
+  border: 1px solid var(--border, #E8E6E1);
+  border-radius: 10px;
+  outline: none;
+}
+
+.email-text-box:focus {
+  border-color: var(--accent, #9E8F70);
+}
+
+.email-submit-btn {
+  padding: 8px 14px;
+  font-size: 11px;
+  font-weight: 900;
+  background: var(--accent, #9E8F70);
+  color: #1C2331;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.email-submit-btn:hover {
+  background: #8B7C5E;
+  color: #ffffff;
+}
+
+.email-feedback-msg {
+  font-size: 10px;
+  font-weight: 700;
+  color: #059669;
+}
+
+.print-footer {
+  padding-top: 4px;
+}
+
+.print-pdf-btn {
+  width: 100%;
+  padding: 10px;
+  background: var(--bg-app, #F8F7F4);
+  color: var(--text-main, #1C2331);
+  border: 1px solid var(--border, #E8E6E1);
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.print-pdf-btn i {
+  color: var(--accent, #9E8F70);
+}
+
+.print-pdf-btn:hover {
+  background: #e2e8f0;
+}
+</style>
