@@ -77,15 +77,15 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="space-y-4">
+  <div class="pos-container space-y-3">
     <!-- Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 no-print">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 no-print">
       <div>
-        <h1 class="text-xl font-black text-slate-800 flex items-center gap-2">
+        <h1 class="text-base sm:text-lg font-black text-slate-800 flex items-center gap-2">
           <i class="fa-solid fa-chart-pie text-emerald-600"></i>
-          Collections & Revenue Report
+          Shift Revenue & Analytics
         </h1>
-        <p class="text-xs text-slate-500">Live backend aggregation for Abja Parks admissions</p>
+        <p class="text-[11px] text-slate-500">Live admission revenue and terminal totals</p>
       </div>
 
       <div class="flex items-center gap-2">

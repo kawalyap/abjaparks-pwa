@@ -126,15 +126,15 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="space-y-4">
+  <div class="pos-container space-y-3">
     <!-- Top Header & Controls -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
       <div>
-        <h1 class="text-xl font-black text-slate-800 flex items-center gap-2">
+        <h1 class="text-base sm:text-lg font-black text-slate-800 flex items-center gap-2">
           <i class="fa-solid fa-clock-rotate-left text-emerald-600"></i>
-          Shift Collection History
+          Shift History
         </h1>
-        <p class="text-xs text-slate-500">View, reprint, or resend receipts for previous collections</p>
+        <p class="text-[11px] text-slate-500">Reprint 58mm receipts & resend e-receipts</p>
       </div>
 
       <div class="flex items-center gap-2">

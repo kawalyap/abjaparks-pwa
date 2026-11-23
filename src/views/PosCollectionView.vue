@@ -1,13 +1,26 @@
 <template>
   <div class="pos-container">
-    <div class="pos-grid">
-      <!-- Left Column: Ticket Category Selection -->
-      <section class="section-card">
-        <div class="section-title">
-          <i class="fa-solid fa-ticket"></i>
-          <span>Select Ticket Category</span>
+    <div class="pos-layout-wrapper">
+      <!-- Left Column / Top Section: Ticket Category Selection -->
+      <section class="section-card category-section">
+        <div class="section-header-compact">
+          <div class="section-title">
+            <i class="fa-solid fa-ticket"></i>
+            <span>Admission Category</span>
+          </div>
+          <!-- Compact quantity stepper for mobile header row -->
+          <div class="compact-qty-stepper sm:hidden">
+            <button class="qty-btn-mini" @click="posStore.setQuantity(posStore.quantity - 1)" :disabled="posStore.quantity <= 1">
+              <i class="fa-solid fa-minus"></i>
+            </button>
+            <span class="qty-value-mini">{{ posStore.quantity }}</span>
+            <button class="qty-btn-mini" @click="posStore.setQuantity(posStore.quantity + 1)" :disabled="posStore.quantity >= 50">
+              <i class="fa-solid fa-plus"></i>
+            </button>
+          </div>
         </div>
 
+        <!-- 4 Fast Admission Categories -->
         <div class="categories-grid">
           <button
             v-for="cat in posStore.categories"
@@ -16,7 +29,7 @@
             :class="{ active: posStore.selectedCategory?.id === cat.id }"
             @click="posStore.selectCategory(cat)"
           >
-            <div class="cat-icon">
+            <div class="cat-icon-wrap">
               <i :class="['fa-solid', cat.icon ? (cat.icon.startsWith('fa-') ? cat.icon : 'fa-' + cat.icon) : 'fa-ticket']"></i>
             </div>
             <div class="cat-info">
@@ -29,115 +42,146 @@
           </button>
         </div>
 
-        <!-- Quantity Stepper -->
+        <!-- Quantity Stepper & Chips (Visible on desktop / tablets, and quick chips on mobile) -->
         <div class="quantity-row">
-          <label class="field-label">Quantity (Tickets):</label>
-          <div class="quantity-controls">
-            <button class="qty-btn" @click="posStore.setQuantity(posStore.quantity - 1)" :disabled="posStore.quantity <= 1">
-              <i class="fa-solid fa-minus"></i>
-            </button>
-            <span class="qty-value">{{ posStore.quantity }}</span>
-            <button class="qty-btn" @click="posStore.setQuantity(posStore.quantity + 1)" :disabled="posStore.quantity >= 50">
-              <i class="fa-solid fa-plus"></i>
-            </button>
-          </div>
-          <div class="qty-quick-chips">
-            <button v-for="q in [1, 2, 3, 5, 10]" :key="q" class="chip-btn" :class="{ active: posStore.quantity === q }" @click="posStore.setQuantity(q)">
+          <div class="qty-chips-bar">
+            <button
+              v-for="q in [1, 2, 3, 5, 10]"
+              :key="q"
+              class="chip-btn"
+              :class="{ active: posStore.quantity === q }"
+              @click="posStore.setQuantity(q)"
+            >
               {{ q }}x
             </button>
+            <!-- Desktop stepper controls -->
+            <div class="hidden sm:flex items-center gap-2 ml-auto">
+              <button class="qty-btn-mini" @click="posStore.setQuantity(posStore.quantity - 1)" :disabled="posStore.quantity <= 1">
+                <i class="fa-solid fa-minus"></i>
+              </button>
+              <span class="qty-value-mini">{{ posStore.quantity }}</span>
+              <button class="qty-btn-mini" @click="posStore.setQuantity(posStore.quantity + 1)" :disabled="posStore.quantity >= 50">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+            </div>
           </div>
         </div>
       </section>
 
-      <!-- Right Column: Customer Phone & Payment Prompt -->
-      <section class="section-card payment-column">
-        <div class="section-title">
-          <i class="fa-solid fa-mobile-screen-button"></i>
-          <span>Customer & Payment Details</span>
-        </div>
-
-        <!-- Order Summary Banner -->
+      <!-- Right Column / Bottom Section: Customer Phone, Numpad & Collection Action -->
+      <section class="section-card payment-section">
+        <!-- Order Total Banner (High contrast) -->
         <div class="total-banner">
-          <div class="total-label">Total to Collect:</div>
+          <div class="total-left">
+            <span class="total-label">Total Amount</span>
+            <div class="total-sub">
+              {{ posStore.selectedCategory?.name || 'Ticket' }} × {{ posStore.quantity }}
+            </div>
+          </div>
           <div class="total-figure">
             UGX {{ posStore.totalAmount.toLocaleString() }}
           </div>
-          <div class="total-sub">
-            {{ posStore.selectedCategory?.name || 'Ticket' }} × {{ posStore.quantity }}
-          </div>
         </div>
 
-        <!-- Phone Number Input with Network Indicator -->
-        <div class="form-group">
-          <label class="field-label">
-            <span>Customer Mobile Money Number</span>
+        <!-- Mobile Money Phone Number Input -->
+        <div class="phone-input-group">
+          <div class="input-header-row">
+            <label class="field-label-compact">Customer Phone (MoMo)</label>
             <span v-if="carrierBadge" :class="['carrier-badge', carrierBadge.toLowerCase()]">
               {{ carrierBadge }}
             </span>
-          </label>
+          </div>
+
           <div class="input-with-icon">
             <i class="fa-solid fa-phone phone-icon"></i>
             <input
               type="tel"
               v-model="posStore.phoneNumber"
-              placeholder="e.g. 0779 123 456"
-              class="pos-input text-lg font-bold"
+              placeholder="0779 123 456"
+              class="pos-input"
               maxlength="13"
-              @input="onPhoneInput"
+              readonly
             />
-          </div>
-          <p class="input-hint">Enter MTN or Airtel phone number to push PIN prompt</p>
-        </div>
-
-        <!-- Optional Customer Details -->
-        <div class="optional-details">
-          <div class="form-group">
-            <label class="field-label-sm">Customer Name (Optional)</label>
-            <input
-              type="text"
-              v-model="posStore.customerName"
-              placeholder="e.g. Michael O."
-              class="pos-input-sm"
-            />
-          </div>
-
-          <div class="form-group">
-            <label class="field-label-sm">Customer Email (Optional for E-Receipt)</label>
-            <input
-              type="email"
-              v-model="posStore.customerEmail"
-              placeholder="customer@example.com"
-              class="pos-input-sm"
-            />
+            <button
+              v-if="posStore.phoneNumber"
+              class="clear-phone-btn"
+              @click="posStore.phoneNumber = ''"
+              title="Clear phone number"
+            >
+              <i class="fa-solid fa-circle-xmark"></i>
+            </button>
           </div>
         </div>
 
-        <!-- Fast Numpad for Touch POS Devices (Sunmi / Handheld) -->
-        <div class="numpad-grid">
-          <button v-for="digit in ['1', '2', '3', '4', '5', '6', '7', '8', '9', '07', '0', '⌫']" :key="digit" class="numpad-key" @click="handleNumpad(digit)">
-            {{ digit }}
+        <!-- Optional Collapsible Customer Details (Name / Email for E-Receipt) -->
+        <div class="optional-accordion">
+          <button
+            type="button"
+            class="accordion-toggle-btn"
+            @click="showOptionalDetails = !showOptionalDetails"
+          >
+            <span>
+              <i class="fa-solid fa-envelope-open-text text-slate-400"></i>
+              {{ showOptionalDetails ? 'Hide Customer Details' : '+ Add Name / Email for E-Receipt' }}
+            </span>
+            <i class="fa-solid fa-chevron-down toggle-arrow" :class="{ 'rotate-180': showOptionalDetails }"></i>
           </button>
+
+          <div v-show="showOptionalDetails" class="accordion-content animate-fade-in">
+            <div class="grid grid-cols-2 gap-2 pt-2">
+              <div>
+                <label class="field-label-sm">Customer Name</label>
+                <input
+                  type="text"
+                  v-model="posStore.customerName"
+                  placeholder="e.g. Michael O."
+                  class="pos-input-sm"
+                />
+              </div>
+              <div>
+                <label class="field-label-sm">Customer Email</label>
+                <input
+                  type="email"
+                  v-model="posStore.customerEmail"
+                  placeholder="name@mail.com"
+                  class="pos-input-sm"
+                />
+              </div>
+            </div>
+          </div>
         </div>
 
-        <!-- Action Button -->
+        <!-- Ergonomic Mobile Touch Numpad (Big thumb-friendly buttons) -->
+        <div class="numpad-container">
+          <div class="numpad-grid">
+            <button
+              v-for="digit in ['1', '2', '3', '4', '5', '6', '7', '8', '9', '07', '0', '⌫']"
+              :key="digit"
+              type="button"
+              class="numpad-key"
+              :class="{ 'key-backspace': digit === '⌫', 'key-prefix': digit === '07' }"
+              @click="handleNumpad(digit)"
+            >
+              {{ digit }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Big Primary Action Button -->
         <div class="action-footer">
           <button
             class="collect-btn"
             :disabled="!posStore.isFormValid || posStore.isInitiating"
             @click="handleCollectPayment"
           >
-            <span v-if="posStore.isInitiating">
+            <span v-if="posStore.isInitiating" class="btn-inner">
               <i class="fa-solid fa-spinner fa-spin"></i>
-              Sending Prompt...
+              Pushing USSD Prompt...
             </span>
-            <span v-else>
+            <span v-else class="btn-inner">
               <i class="fa-solid fa-bolt"></i>
-              Collect UGX {{ posStore.totalAmount.toLocaleString() }}
+              <span>Collect UGX {{ posStore.totalAmount.toLocaleString() }}</span>
             </span>
-          </button>
-
-          <button v-if="posStore.phoneNumber" class="clear-btn" @click="posStore.resetForm">
-            Clear Form
           </button>
         </div>
       </section>
@@ -146,18 +190,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { usePosStore } from '@/stores/usePosStore'
 
 const router = useRouter()
 const posStore = usePosStore()
 
-onMounted(() => {
-  if (posStore.categories.length === 0) {
-    posStore.loadCategories()
-  }
-})
+const showOptionalDetails = ref(false)
 
 // Carrier Detection
 const carrierBadge = computed(() => {
@@ -166,11 +206,6 @@ const carrierBadge = computed(() => {
   if (/^(0|256)?(70|75|74)/.test(clean)) return 'Airtel Money'
   return null
 })
-
-function onPhoneInput(e: Event) {
-  const input = e.target as HTMLInputElement
-  posStore.phoneNumber = input.value
-}
 
 function handleNumpad(val: string) {
   if (val === '⌫') {
@@ -190,57 +225,72 @@ async function handleCollectPayment() {
     await posStore.initiateCollection()
     router.push({ name: 'pos.processing' })
   } catch (err: any) {
-    alert(err.message || 'Payment initiation failed')
+    alert(err.message || 'Payment collection failed')
   }
 }
+
+onMounted(() => {
+  if (posStore.categories.length === 0) {
+    posStore.loadCategories()
+  }
+})
 </script>
 
 <style scoped>
 .pos-container {
-  padding: 18px 24px;
+  padding: 10px 14px;
   max-width: 1100px;
   margin: 0 auto;
   width: 100%;
 }
 
-.pos-grid {
+.pos-layout-wrapper {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: 16px;
 }
 
 .section-card {
   background: var(--card-bg);
   border-radius: var(--ax-radius-lg);
-  padding: 20px;
-  box-shadow: var(--ax-shadow-med);
+  padding: 16px;
+  box-shadow: var(--ax-shadow-low);
   border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
 }
 
+.section-header-compact {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
 .section-title {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 15px;
-  font-weight: 700;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   color: var(--text-main);
-  margin-bottom: 16px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--border);
 }
 
 .section-title i {
   color: var(--primary);
+  font-size: 14px;
 }
 
-/* Category Grid */
+/* Categories Grid */
 .categories-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: 10px;
+  margin-bottom: 12px;
 }
 
 .category-btn {
@@ -248,19 +298,19 @@ async function handleCollectPayment() {
   border: 1px solid var(--border);
   border-radius: var(--ax-radius-md);
   box-shadow: var(--ax-shadow-low);
-  padding: 16px;
+  padding: 12px 14px;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
+  gap: 10px;
   position: relative;
   text-align: left;
   transition: all var(--duration-fast, 125ms) ease;
+  min-height: 58px;
 }
 
 .category-btn:hover {
   border-color: var(--border-strong);
   box-shadow: var(--ax-shadow-med);
-  transform: translateY(-1px);
 }
 
 .category-btn.active {
@@ -269,89 +319,62 @@ async function handleCollectPayment() {
   box-shadow: var(--ax-shadow-focus);
 }
 
-.cat-icon {
-  font-size: 24px;
+.cat-icon-wrap {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--ax-radius-xs);
+  background: var(--bg-app);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
   color: var(--primary);
-  margin-bottom: 10px;
+  flex-shrink: 0;
+}
+
+.category-btn.active .cat-icon-wrap {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.cat-info {
+  min-width: 0;
+  flex: 1;
 }
 
 .cat-name {
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--text-main);
   line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .cat-amount {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 800;
   color: var(--primary);
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 .cat-check {
-  position: absolute;
-  top: 10px;
-  right: 10px;
   color: var(--primary);
-  font-size: 18px;
+  font-size: 16px;
+  flex-shrink: 0;
 }
 
 /* Quantity Row */
 .quantity-row {
   margin-top: auto;
-  padding-top: 16px;
-  border-top: 1px solid var(--border);
+  padding-top: 8px;
 }
 
-.field-label {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-main);
-  margin-bottom: 8px;
-}
-
-.quantity-controls {
+.qty-chips-bar {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.qty-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: var(--ax-radius-sm);
-  background: var(--bg-app);
-  border: 1px solid var(--border);
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--text-main);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: var(--ax-shadow-low);
-  transition: all var(--duration-fast, 125ms) ease;
-}
-
-.qty-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.qty-value {
-  font-size: 22px;
-  font-weight: 800;
-  min-width: 40px;
-  text-align: center;
-}
-
-.qty-quick-chips {
-  display: flex;
-  gap: 8px;
+  gap: 6px;
 }
 
 .chip-btn {
@@ -360,7 +383,7 @@ async function handleCollectPayment() {
   background: var(--bg-app);
   border: 1px solid var(--border);
   border-radius: var(--ax-radius-full);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--text-muted);
   transition: all var(--duration-fast, 125ms) ease;
@@ -373,45 +396,102 @@ async function handleCollectPayment() {
   box-shadow: var(--ax-shadow-low);
 }
 
-/* Payment Column */
-.total-banner {
-  background: linear-gradient(135deg, #004F71 0%, #002e42 100%);
-  color: #ffffff;
-  border-radius: 12px;
-  padding: 16px 20px;
-  margin-bottom: 18px;
+.compact-qty-stepper,
+.qty-stepper-desktop {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.qty-btn-mini {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--ax-radius-xs);
+  background: var(--bg-app);
+  border: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qty-btn-mini:disabled {
+  opacity: 0.3;
+}
+
+.qty-value-mini {
+  font-size: 14px;
+  font-weight: 800;
+  min-width: 20px;
   text-align: center;
 }
 
+/* Order Total Banner */
+.total-banner {
+  background: linear-gradient(135deg, #004F71 0%, #002e42 100%);
+  color: #ffffff;
+  border-radius: var(--ax-radius-md);
+  box-shadow: var(--ax-shadow-low);
+  padding: 10px 14px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.total-left {
+  display: flex;
+  flex-direction: column;
+}
+
 .total-label {
-  font-size: 12px;
+  font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   opacity: 0.8;
+  font-weight: 700;
+}
+
+.total-sub {
+  font-size: 11px;
+  opacity: 0.9;
   font-weight: 600;
 }
 
 .total-figure {
-  font-size: 32px;
+  font-size: 22px;
   font-weight: 800;
   letter-spacing: -0.5px;
-  margin: 2px 0;
+  color: var(--accent);
 }
 
-.total-sub {
-  font-size: 13px;
-  opacity: 0.85;
+/* Phone Input */
+.phone-input-group {
+  margin-bottom: 8px;
 }
 
-.form-group {
-  margin-bottom: 14px;
+.input-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.field-label-compact {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
 .carrier-badge {
-  font-size: 11px;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: var(--ax-radius-full);
 }
 
 .carrier-badge.mtn {
@@ -432,133 +512,201 @@ async function handleCollectPayment() {
 
 .phone-icon {
   position: absolute;
-  left: 14px;
-  color: #94a3b8;
-  font-size: 16px;
+  left: 12px;
+  color: var(--primary);
+  font-size: 14px;
 }
 
 .pos-input {
   width: 100%;
-  padding: 14px 14px 14px 42px;
-  border: 2px solid #cbd5e1;
-  border-radius: 10px;
-  font-size: 18px;
-  font-weight: 700;
+  padding: 10px 36px 10px 34px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--ax-radius-sm);
+  background: var(--card-bg);
+  color: var(--text-main);
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 1px;
   outline: none;
-  transition: border-color 0.15s ease;
 }
 
-.pos-input:focus {
-  border-color: var(--primary);
-}
-
-.input-hint {
-  font-size: 11px;
+.clear-phone-btn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
   color: var(--text-muted);
-  margin-top: 4px;
+  font-size: 16px;
+  padding: 4px;
 }
 
-.optional-details {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
+/* Optional Accordion */
+.optional-accordion {
+  margin-bottom: 8px;
+}
+
+.accordion-toggle-btn {
+  width: 100%;
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 2px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.toggle-arrow {
+  font-size: 10px;
+  transition: transform var(--duration-fast, 125ms) ease;
+}
+
+.rotate-180 {
+  transform: rotate(180deg);
 }
 
 .field-label-sm {
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 10px;
+  font-weight: 700;
   color: var(--text-muted);
   display: block;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .pos-input-sm {
   width: 100%;
-  padding: 8px 10px;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  font-size: 12px;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--ax-radius-xs);
+  background: var(--card-bg);
+  color: var(--text-main);
+  font-size: 11px;
   outline: none;
 }
 
-.pos-input-sm:focus {
-  border-color: var(--primary);
+/* Numpad */
+.numpad-container {
+  margin-bottom: 10px;
 }
 
-/* Numpad */
 .numpad-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-top: 10px;
-  margin-bottom: 16px;
+  gap: 6px;
 }
 
 .numpad-key {
-  padding: 12px 0;
+  height: 48px;
   background: var(--bg-app);
   border: 1px solid var(--border);
   border-radius: var(--ax-radius-sm);
   box-shadow: var(--ax-shadow-low);
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--text-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: all var(--duration-fast, 125ms) ease;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .numpad-key:active {
   background: #cbd5e1;
-  transform: scale(0.97);
+  transform: scale(0.96);
 }
 
-/* Action Footer */
+.key-prefix {
+  font-size: 15px;
+  color: var(--primary);
+}
+
+.key-backspace {
+  color: #ef4444;
+  font-size: 16px;
+}
+
+/* Action Button */
 .action-footer {
-  display: flex;
-  gap: 10px;
   margin-top: auto;
 }
 
 .collect-btn {
-  flex: 1;
+  width: 100%;
+  height: 50px;
   background: var(--accent);
   color: #000000;
-  padding: 16px 20px;
   border-radius: var(--ax-radius-md);
   box-shadow: var(--ax-shadow-med);
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 800;
+  transition: all var(--duration-fast, 125ms) ease;
+}
+
+.btn-inner {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  transition: all var(--duration-fast, 125ms) ease;
+  gap: 8px;
 }
 
 .collect-btn:hover:not(:disabled) {
   background: var(--accent-hover);
-  transform: translateY(-1px);
+}
+
+.collect-btn:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 .collect-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.45;
   cursor: not-allowed;
   box-shadow: none;
 }
 
-.clear-btn {
-  padding: 14px 16px;
-  background: var(--bg-app);
-  border: 1px solid var(--border);
-  border-radius: var(--ax-radius-md);
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--text-muted);
-  transition: all var(--duration-fast, 125ms) ease;
-}
-
-@media (max-width: 860px) {
-  .pos-grid {
+/* Mobile Handheld Responsive Optimization */
+@media (max-width: 768px) {
+  .pos-container {
+    padding: 6px 8px;
+  }
+  .pos-layout-wrapper {
     grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .section-card {
+    padding: 10px;
+    border-radius: var(--ax-radius-md);
+  }
+  .categories-grid {
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .category-btn {
+    padding: 8px 10px;
+    min-height: 50px;
+    gap: 8px;
+  }
+  .cat-icon-wrap {
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+  }
+  .cat-name {
+    font-size: 12px;
+  }
+  .cat-amount {
+    font-size: 11px;
+  }
+  .numpad-key {
+    height: 46px;
+    font-size: 17px;
+  }
+  .collect-btn {
+    height: 48px;
+    font-size: 14px;
   }
 }
 </style>

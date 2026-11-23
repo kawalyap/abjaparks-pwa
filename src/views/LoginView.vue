@@ -38,7 +38,7 @@ function handleLogin() {
 </script>
 
 <template>
-  <div class="max-w-md mx-auto py-8">
+  <div class="pos-container py-4 max-w-md mx-auto">
     <div class="bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden">
       <!-- Header -->
       <div class="bg-gradient-to-r from-emerald-800 to-teal-900 text-white p-6 text-center">
