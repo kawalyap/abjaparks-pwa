@@ -18,7 +18,21 @@ function getHeaders(token?: string) {
     'Content-Type': 'application/json',
     Accept: 'application/json',
   }
-  const authToken = token || (typeof localStorage !== 'undefined' ? localStorage.getItem('abja_pos_token') : null)
+  let authToken = token
+  if (!authToken && typeof localStorage !== 'undefined') {
+    authToken = localStorage.getItem('abja_pos_token') || ''
+    if (!authToken) {
+      try {
+        const raw = localStorage.getItem('abja_pos_session')
+        if (raw) {
+          const parsed = JSON.parse(raw)
+          authToken = parsed.token || ''
+        }
+      } catch {
+        authToken = ''
+      }
+    }
+  }
   if (authToken) {
     h['Authorization'] = `Bearer ${authToken}`
   }

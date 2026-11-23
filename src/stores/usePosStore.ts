@@ -14,16 +14,16 @@ import type {
 } from '@/types'
 
 export const usePosStore = defineStore('pos', () => {
-  // Agent & Terminal Session
+  // Agent & Terminal Session (Authentication Required for Shift Operations)
   const session = useStorage<AgentSession>('abja_pos_session', {
-    agentName: 'Sarah K.',
-    terminalId: 'POS-01',
-    terminalName: 'Main Gate Station 1',
-    userEmail: 'sarah@abjaparks.com',
-    userRole: 'attendant',
+    agentName: '',
+    terminalId: '',
+    terminalName: '',
+    userEmail: '',
+    userRole: '',
     token: '',
-    isLoggedIn: true,
-    loginTime: new Date().toISOString(),
+    isLoggedIn: false,
+    loginTime: '',
   })
 
   const DEFAULT_CATEGORIES: TicketCategory[] = [
@@ -128,9 +128,21 @@ export const usePosStore = defineStore('pos', () => {
 
   // End shift / logout
   async function logout() {
-    await api.logout()
-    session.value.isLoggedIn = false
-    session.value.token = ''
+    try {
+      await api.logout()
+    } catch (e) {
+      console.warn('Logout API error:', e)
+    } finally {
+      session.value.isLoggedIn = false
+      session.value.token = ''
+      session.value.agentName = ''
+      session.value.terminalId = ''
+      session.value.terminalName = ''
+      session.value.userEmail = ''
+      session.value.userRole = ''
+      session.value.loginTime = ''
+      resetForm()
+    }
   }
 
   // Fast select category

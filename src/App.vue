@@ -114,35 +114,35 @@ onMounted(() => {
 .pos-header {
   background-color: var(--primary);
   color: #ffffff;
-  padding: 8px 16px;
+  padding: 6px 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
   border-bottom: 2px solid var(--accent);
   position: sticky;
   top: 0;
   z-index: 100;
-  height: 56px;
+  height: 48px;
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .brand-logo-container {
   display: flex;
   align-items: center;
   background: #ffffff;
-  padding: 4px 8px;
+  padding: 2px 6px;
   border-radius: var(--ax-radius-xs);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
 .brand-logo-img {
-  height: 28px;
+  height: 22px;
   width: auto;
   object-fit: contain;
   display: block;
@@ -155,8 +155,8 @@ onMounted(() => {
 
 .brand-sub {
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.85);
-  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 700;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -236,10 +236,10 @@ onMounted(() => {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 56px;
+  height: 48px;
   background: #ffffff;
-  border-top: 2px solid var(--accent);
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.08);
+  border-top: 1.5px solid var(--accent);
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
   z-index: 100;
   padding-bottom: env(safe-area-inset-bottom);
 }
@@ -250,18 +250,18 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 1px;
   text-decoration: none;
   color: #6B7280;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
-  padding: 6px 0;
+  padding: 4px 0;
   transition: all var(--duration-fast, 125ms) ease;
   -webkit-tap-highlight-color: transparent;
 }
 
 .bottom-tab i {
-  font-size: 18px;
+  font-size: 15px;
 }
 
 .bottom-tab.active {
@@ -282,7 +282,7 @@ onMounted(() => {
     display: flex;
   }
   .with-bottom-nav {
-    padding-bottom: calc(56px + env(safe-area-inset-bottom));
+    padding-bottom: calc(48px + env(safe-area-inset-bottom));
   }
 }
 </style>

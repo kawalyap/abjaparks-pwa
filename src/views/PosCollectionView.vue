@@ -716,46 +716,200 @@ onMounted(() => {
   box-shadow: none;
 }
 
-/* Mobile Handheld Responsive Optimization */
+/* Mobile Handheld Responsive Optimization (Fits Complete Screen Above the Fold) */
 @media (max-width: 768px) {
   .pos-container {
-    padding: 8px 10px;
+    padding: 4px 8px;
+    max-width: 100%;
   }
+
   .pos-layout-wrapper {
     grid-template-columns: 1fr;
-    gap: 10px;
+    gap: 6px;
   }
+
   .section-card {
-    padding: 12px;
-    border-radius: var(--ax-radius-md);
+    padding: 8px 10px;
+    border-radius: 10px;
+    margin-bottom: 0;
   }
-  .categories-grid {
-    gap: 8px;
-    margin-bottom: 10px;
+
+  .section-header-compact {
+    margin-bottom: 6px;
+    padding-bottom: 4px;
   }
-  .category-btn {
-    padding: 10px;
-    min-height: 56px;
-    gap: 8px;
-  }
-  .cat-icon-wrap {
-    width: 32px;
-    height: 32px;
-    font-size: 15px;
-  }
-  .cat-name {
-    font-size: 12px;
-  }
-  .cat-amount {
+
+  .section-title {
     font-size: 11px;
+    letter-spacing: 0.3px;
   }
-  .pos-input {
-    padding: 12px 36px 12px 38px;
+
+  .section-title i {
+    font-size: 13px;
+  }
+
+  .categories-grid {
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+
+  .category-btn {
+    padding: 6px 8px;
+    min-height: 42px;
+    gap: 6px;
+    border-radius: 8px;
+  }
+
+  .cat-icon-wrap {
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
+    border-radius: 6px;
+  }
+
+  .cat-name {
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1.1;
+  }
+
+  .cat-amount {
+    font-size: 10px;
+    font-weight: 800;
+    margin-top: 1px;
+  }
+
+  .cat-check {
+    font-size: 13px;
+  }
+
+  .quantity-row {
+    padding-top: 2px;
+  }
+
+  .qty-chips-bar {
+    gap: 4px;
+  }
+
+  .chip-btn {
+    padding: 4px 0;
+    font-size: 11px;
+    font-weight: 800;
+  }
+
+  .compact-qty-stepper {
+    gap: 4px;
+  }
+
+  .qty-btn-mini {
+    width: 26px;
+    height: 26px;
+    font-size: 11px;
+    border-radius: 6px;
+  }
+
+  .qty-value-mini {
+    font-size: 13px;
+    min-width: 16px;
+  }
+
+  /* Compact Order Total Banner */
+  .total-banner {
+    padding: 6px 12px;
+    margin-bottom: 6px;
+    border-radius: 8px;
+  }
+
+  .total-label {
+    font-size: 9px;
+    letter-spacing: 0.4px;
+  }
+
+  .total-sub {
+    font-size: 10px;
+    margin-top: 0;
+  }
+
+  .total-figure {
     font-size: 18px;
+    letter-spacing: -0.3px;
   }
-  .collect-btn {
-    height: 50px;
+
+  /* Compact Phone Input */
+  .phone-input-group {
+    margin-bottom: 4px;
+  }
+
+  .input-header-row {
+    margin-bottom: 2px;
+  }
+
+  .field-label-compact {
+    font-size: 10px;
+  }
+
+  .carrier-badge {
+    font-size: 9px;
+    padding: 1px 6px;
+  }
+
+  .phone-icon {
+    left: 10px;
+    font-size: 13px;
+  }
+
+  .pos-input {
+    padding: 8px 30px 8px 32px;
+    font-size: 16px;
+    border-radius: 8px;
+    height: 42px;
+  }
+
+  .clear-phone-btn {
+    right: 8px;
     font-size: 15px;
+  }
+
+  .input-hint {
+    font-size: 9px;
+    margin-top: 2px;
+  }
+
+  /* Wrapped Prefix Chips so nothing overflows */
+  .prefix-chips-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 6px;
+  }
+
+  .prefix-chip {
+    padding: 3px 7px;
+    font-size: 10px;
+    font-weight: 800;
+  }
+
+  /* Optional Accordion */
+  .optional-accordion {
+    margin-bottom: 6px;
+    padding: 4px 8px;
+    border-radius: 6px;
+  }
+
+  .accordion-toggle-btn {
+    font-size: 10px;
+  }
+
+  /* High Visibility Primary Button */
+  .action-footer {
+    margin-top: 2px;
+  }
+
+  .collect-btn {
+    height: 44px;
+    font-size: 14px;
+    border-radius: 8px;
+    box-shadow: 0 3px 8px rgba(158, 143, 112, 0.35);
   }
 }
 </style>

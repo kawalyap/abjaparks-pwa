@@ -53,4 +53,31 @@ router.beforeEach((to, _from, next) => {
   next()
 })
 
+// Strict Navigation Guard: Authenticate Attendants Before Allowing Shift Operations
+router.beforeEach((to, _from, next) => {
+  // Public routes: Login and Customer Public E-Receipt
+  if (to.name === 'pos.login' || to.name === 'pos.public-receipt') {
+    next()
+    return
+  }
+
+  // Check persisted POS shift session
+  let isAuthenticated = false
+  try {
+    const raw = localStorage.getItem('abja_pos_session')
+    if (raw) {
+      const sess = JSON.parse(raw)
+      isAuthenticated = sess?.isLoggedIn === true && !!sess?.token
+    }
+  } catch {
+    isAuthenticated = false
+  }
+
+  if (!isAuthenticated) {
+    next({ name: 'pos.login', query: { redirect: to.fullPath } })
+  } else {
+    next()
+  }
+})
+
 export default router
