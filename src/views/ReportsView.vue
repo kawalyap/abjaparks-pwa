@@ -77,45 +77,45 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="pos-container space-y-3">
+  <div class="pos-container max-w-2xl mx-auto py-3 px-3 space-y-3">
     <!-- Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 no-print">
+    <div class="flex items-center justify-between gap-2 no-print">
       <div>
-        <h1 class="text-base sm:text-lg font-black text-slate-800 flex items-center gap-2">
-          <i class="fa-solid fa-chart-pie text-emerald-600"></i>
-          Shift Revenue & Analytics
+        <h1 class="text-base font-black text-[#1C2331] uppercase tracking-tight flex items-center gap-2">
+          <i class="fa-solid fa-chart-pie text-[#9E8F70]"></i>
+          Shift Revenue & Reports
         </h1>
-        <p class="text-[11px] text-slate-500">Live admission revenue and terminal totals</p>
+        <p class="text-[11px] text-slate-500 font-medium">Admission analytics and terminal shift totals</p>
       </div>
 
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1.5">
         <button
           @click="printShiftSummary"
-          class="px-3.5 py-1.5 text-xs font-bold text-white bg-slate-800 hover:bg-slate-900 rounded-lg shadow-sm flex items-center gap-1.5 transition"
+          class="px-3 py-1.5 text-xs font-black text-white bg-[#1C2331] hover:bg-[#121722] rounded-xl shadow-xs flex items-center gap-1.5 transition"
         >
-          <i class="fa-solid fa-print"></i>
-          Print Shift Report (Z)
+          <i class="fa-solid fa-print text-[#9E8F70]"></i>
+          <span>Print Z-Report</span>
         </button>
       </div>
     </div>
 
     <!-- Date Range Filters -->
-    <div class="bg-white border border-slate-200 rounded-xl p-3 shadow-xs space-y-2 no-print">
+    <div class="bg-white border border-[#E8E6E1] rounded-2xl p-3 shadow-xs space-y-2.5 no-print">
       <div class="flex flex-wrap items-center justify-between gap-2">
         <!-- Preset tabs -->
-        <div class="flex gap-1.5 bg-slate-100 p-1 rounded-lg">
+        <div class="flex gap-1 bg-[#F8F7F4] p-1 rounded-xl border border-[#E8E6E1]">
           <button
             v-for="p in ['today', 'yesterday', 'week', 'month'] as const"
             :key="p"
             @click="setPreset(p)"
-            class="px-2.5 py-1 text-xs font-bold rounded-md transition capitalize"
+            class="px-2.5 py-1 text-xs font-black rounded-lg transition capitalize"
             :class="[
               activePreset === p
-                ? 'bg-white text-emerald-700 shadow-xs'
+                ? 'bg-[#1C2331] text-white shadow-xs'
                 : 'text-slate-600 hover:text-slate-900'
             ]"
           >
-            {{ p }}
+            {{ p === 'week' ? '7 Days' : p === 'month' ? 'This Month' : p }}
           </button>
         </div>
 
@@ -124,17 +124,17 @@ onMounted(() => {
           <input
             v-model="customFrom"
             type="date"
-            class="px-2 py-1 bg-slate-50 border border-slate-200 rounded text-xs font-medium"
+            class="px-2 py-1 bg-[#F8F7F4] border border-[#E8E6E1] rounded-lg text-xs font-bold text-[#1C2331] outline-none focus:ring-2 focus:ring-[#9E8F70]"
           />
-          <span class="text-slate-400">to</span>
+          <span class="text-slate-400 font-bold">to</span>
           <input
             v-model="customTo"
             type="date"
-            class="px-2 py-1 bg-slate-50 border border-slate-200 rounded text-xs font-medium"
+            class="px-2 py-1 bg-[#F8F7F4] border border-[#E8E6E1] rounded-lg text-xs font-bold text-[#1C2331] outline-none focus:ring-2 focus:ring-[#9E8F70]"
           />
           <button
             @click="fetchReport"
-            class="px-3 py-1 bg-emerald-600 text-white rounded font-bold hover:bg-emerald-700 transition"
+            class="px-2.5 py-1 bg-[#9E8F70] text-[#1C2331] rounded-lg text-xs font-black hover:bg-[#8B7C5E] transition"
           >
             Apply
           </button>
@@ -144,19 +144,19 @@ onMounted(() => {
 
     <!-- Loading -->
     <div v-if="isLoading" class="py-16 text-center text-slate-400">
-      <i class="fa-solid fa-circle-notch fa-spin text-2xl text-emerald-600 mb-2"></i>
-      <p class="text-xs font-semibold">Aggregating shift statistics...</p>
+      <i class="fa-solid fa-circle-notch fa-spin text-2xl text-[#9E8F70] mb-2"></i>
+      <p class="text-xs font-bold text-slate-600">Aggregating shift statistics...</p>
     </div>
 
     <!-- Error -->
-    <div v-else-if="errorMessage" class="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
-      <i class="fa-solid fa-triangle-exclamation text-red-500 text-xl mb-1"></i>
-      <p class="text-xs font-bold text-red-700">{{ errorMessage }}</p>
-      <button @click="fetchReport" class="mt-2 text-xs font-bold text-red-600 underline">Try Again</button>
+    <div v-else-if="errorMessage" class="bg-rose-50 border border-rose-200 rounded-2xl p-4 text-center">
+      <i class="fa-solid fa-triangle-exclamation text-rose-500 text-xl mb-1"></i>
+      <p class="text-xs font-bold text-rose-700">{{ errorMessage }}</p>
+      <button @click="fetchReport" class="mt-2 text-xs font-black text-[#1C2331] underline">Try Again</button>
     </div>
 
     <!-- Report Body -->
-    <div v-else-if="reportData" class="space-y-4">
+    <div v-else-if="reportData" class="space-y-3">
       <!-- Printable Shift Header (Visible in print) -->
       <div class="hidden print:block text-center border-b pb-3 mb-3">
         <h2 class="text-base font-black">ABJA PARKS & RECREATION</h2>
@@ -165,65 +165,73 @@ onMounted(() => {
         <p class="text-[9px]">Terminal: {{ store.session.terminalId }} | Agent: {{ store.session.agentName }}</p>
       </div>
 
-      <!-- Top KPI Cards -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-xs border-t-2 border-[#9E8F70]">
-          <div class="text-[10px] uppercase font-bold text-slate-400">Total Revenue</div>
-          <div class="text-lg sm:text-xl font-black text-[#8D7E5F] mt-1">
+      <!-- Top KPI Cards (Astryx Cards with Abja Gold) -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+        <div class="bg-gradient-to-br from-[#1C2331] to-[#252E40] text-white rounded-2xl p-3.5 shadow-md border-b-2 border-[#9E8F70] col-span-2 sm:col-span-1">
+          <div class="text-[9px] uppercase font-black text-[#D4C7AC] tracking-wider">Total Revenue</div>
+          <div class="text-lg font-black text-white mt-0.5 tracking-tight">
             {{ formatCurrency(reportData.summary.total_revenue) }}
           </div>
-          <div class="text-[10px] text-slate-400 mt-0.5">Paid via MoMo / Cash</div>
+          <div class="text-[9px] text-[#D4C7AC]/80 mt-1 font-semibold flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            Settled via MoMo
+          </div>
         </div>
 
-        <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-xs">
-          <div class="text-[10px] uppercase font-bold text-slate-400">Total Tickets Sold</div>
-          <div class="text-lg sm:text-xl font-black text-slate-800 mt-1">
+        <div class="bg-white border border-[#E8E6E1] rounded-2xl p-3.5 shadow-xs">
+          <div class="text-[9px] uppercase font-black text-slate-400 tracking-wider">Tickets Sold</div>
+          <div class="text-lg font-black text-[#1C2331] mt-0.5 tracking-tight">
             {{ reportData.summary.total_tickets_sold }}
           </div>
-          <div class="text-[10px] text-slate-400 mt-0.5">Admissions granted</div>
+          <div class="text-[9px] text-slate-400 mt-1 font-medium">Admissions granted</div>
         </div>
 
-        <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-xs">
-          <div class="text-[10px] uppercase font-bold text-slate-400">Successful Txns</div>
-          <div class="text-lg sm:text-xl font-black text-slate-800 mt-1">
+        <div class="bg-white border border-[#E8E6E1] rounded-2xl p-3.5 shadow-xs">
+          <div class="text-[9px] uppercase font-black text-slate-400 tracking-wider">Successful Txns</div>
+          <div class="text-lg font-black text-emerald-700 mt-0.5 tracking-tight">
             {{ reportData.summary.successful_transactions }}
           </div>
-          <div class="text-[10px] text-emerald-600 mt-0.5 font-semibold">Confirmed</div>
+          <div class="text-[9px] text-emerald-600 mt-1 font-bold">Paid & Confirmed</div>
         </div>
 
-        <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-xs">
-          <div class="text-[10px] uppercase font-bold text-slate-400">Failed / Expired</div>
-          <div class="text-lg sm:text-xl font-black text-rose-600 mt-1">
+        <div class="bg-white border border-[#E8E6E1] rounded-2xl p-3.5 shadow-xs">
+          <div class="text-[9px] uppercase font-black text-slate-400 tracking-wider">Declined / Failed</div>
+          <div class="text-lg font-black text-rose-600 mt-0.5 tracking-tight">
             {{ reportData.summary.failed_transactions }}
           </div>
-          <div class="text-[10px] text-slate-400 mt-0.5">Declined or timed out</div>
+          <div class="text-[9px] text-slate-400 mt-1 font-medium">Timed out / canceled</div>
         </div>
       </div>
 
       <!-- Category Breakdown -->
-      <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-xs">
-        <h3 class="text-xs font-black uppercase text-slate-700 tracking-wider mb-3 flex items-center gap-1.5">
-          <i class="fa-solid fa-ticket text-emerald-600"></i>
-          Ticket Category Breakdown
+      <div class="bg-white border border-[#E8E6E1] rounded-2xl p-4 shadow-xs">
+        <h3 class="text-xs font-black uppercase text-[#1C2331] tracking-wider mb-3 flex items-center justify-between">
+          <span class="flex items-center gap-1.5">
+            <i class="fa-solid fa-ticket text-[#9E8F70]"></i>
+            Ticket Category Breakdown
+          </span>
+          <span class="text-[10px] text-slate-400 font-semibold lowercase">
+            {{ reportData.category_breakdown.length }} categories
+          </span>
         </h3>
 
         <div class="space-y-3">
           <div
             v-for="cat in reportData.category_breakdown"
             :key="cat.category_name"
-            class="space-y-1"
+            class="bg-[#F8F7F4] border border-[#E8E6E1] rounded-xl p-2.5 space-y-1.5"
           >
-            <div class="flex justify-between text-xs font-semibold">
-              <span class="text-slate-800">{{ cat.category_name }}</span>
-              <span class="text-slate-500">
-                {{ cat.tickets_sold }} ticket(s) &bull;
-                <strong class="text-slate-800">{{ formatCurrency(cat.revenue) }}</strong>
-              </span>
+            <div class="flex justify-between items-center text-xs">
+              <span class="font-bold text-[#1C2331]">{{ cat.category_name }}</span>
+              <div class="text-right">
+                <span class="font-black text-[#1C2331]">{{ formatCurrency(cat.revenue) }}</span>
+                <span class="text-[10px] text-slate-500 font-medium ml-1">({{ cat.tickets_sold }} sold)</span>
+              </div>
             </div>
             <!-- Progress bar -->
-            <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+            <div class="w-full bg-slate-200/80 rounded-full h-1.5 overflow-hidden">
               <div
-                class="bg-[#9E8F70] h-2 rounded-full transition-all duration-500"
+                class="bg-[#9E8F70] h-1.5 rounded-full transition-all duration-500"
                 :style="{
                   width: `${reportData.summary.total_revenue > 0 ? (cat.revenue / reportData.summary.total_revenue) * 100 : 0}%`
                 }"
@@ -231,43 +239,47 @@ onMounted(() => {
             </div>
           </div>
 
-          <div v-if="reportData.category_breakdown.length === 0" class="text-xs text-slate-400 text-center py-4">
+          <div v-if="reportData.category_breakdown.length === 0" class="text-xs text-slate-400 text-center py-4 font-semibold">
             No tickets sold in this period.
           </div>
         </div>
       </div>
 
       <!-- Terminal Breakdown -->
-      <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-xs">
-        <h3 class="text-xs font-black uppercase text-slate-700 tracking-wider mb-3 flex items-center gap-1.5">
-          <i class="fa-solid fa-desktop text-emerald-600"></i>
-          Terminal / POS Distribution
+      <div class="bg-white border border-[#E8E6E1] rounded-2xl p-4 shadow-xs">
+        <h3 class="text-xs font-black uppercase text-[#1C2331] tracking-wider mb-3 flex items-center justify-between">
+          <span class="flex items-center gap-1.5">
+            <i class="fa-solid fa-desktop text-[#9E8F70]"></i>
+            Terminal / Gate Distribution
+          </span>
+          <span class="text-[10px] text-slate-400 font-semibold lowercase">
+            {{ reportData.terminal_summary.length }} registers
+          </span>
         </h3>
 
-        <div class="overflow-x-auto">
-          <table class="w-full text-xs text-left">
-            <thead>
-              <tr class="border-b border-slate-200 text-slate-400 uppercase font-black text-[10px]">
-                <th class="py-2">Terminal ID</th>
-                <th class="py-2 text-center">Transactions</th>
-                <th class="py-2 text-right">Revenue</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100">
-              <tr
-                v-for="t in reportData.terminal_summary"
-                :key="t.terminal_id"
-                class="hover:bg-slate-50 font-medium"
-              >
-                <td class="py-2.5 font-bold text-slate-800">{{ t.terminal_id || 'Default' }}</td>
-                <td class="py-2.5 text-center text-slate-600">{{ t.tx_count }}</td>
-                <td class="py-2.5 text-right font-black text-slate-900">{{ formatCurrency(t.revenue) }}</td>
-              </tr>
-              <tr v-if="reportData.terminal_summary.length === 0">
-                <td colspan="3" class="text-center py-4 text-slate-400">No terminal activity recorded</td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="space-y-2">
+          <div
+            v-for="t in reportData.terminal_summary"
+            :key="t.terminal_id"
+            class="flex items-center justify-between p-2.5 bg-[#F8F7F4] border border-[#E8E6E1] rounded-xl"
+          >
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 bg-[#1C2331] text-[#D4C7AC] rounded-lg flex items-center justify-center text-xs font-black">
+                <i class="fa-solid fa-cash-register"></i>
+              </div>
+              <div>
+                <div class="text-xs font-black text-[#1C2331]">{{ t.terminal_id || 'Default Terminal' }}</div>
+                <div class="text-[10px] text-slate-500 font-medium">{{ t.tx_count }} completed transactions</div>
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="text-xs font-black text-[#1C2331]">{{ formatCurrency(t.revenue) }}</div>
+            </div>
+          </div>
+
+          <div v-if="reportData.terminal_summary.length === 0" class="text-center py-4 text-xs text-slate-400 font-semibold">
+            No terminal activity recorded
+          </div>
         </div>
       </div>
     </div>

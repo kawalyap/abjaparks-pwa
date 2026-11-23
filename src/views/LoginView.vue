@@ -12,19 +12,29 @@ const pin = ref('')
 const error = ref<string | null>(null)
 
 const terminals = [
-  { id: 'POS-01', name: 'Main Gate Terminal 1' },
-  { id: 'POS-02', name: 'Main Gate Terminal 2' },
-  { id: 'POS-03', name: 'VIP Entrance' },
-  { id: 'POS-04', name: 'Poolside / Garden' },
+  { id: 'POS-01', name: 'Main Gate 1', icon: 'fa-door-open', badge: 'Active' },
+  { id: 'POS-02', name: 'Main Gate 2', icon: 'fa-truck-ramp-box', badge: 'Standby' },
+  { id: 'POS-03', name: 'VIP Entrance', icon: 'fa-crown', badge: 'VIP Only' },
+  { id: 'POS-04', name: 'Poolside & Garden', icon: 'fa-water-ladder', badge: 'Outdoor' },
 ]
+
+const quickAttendants = ['Sarah K.', 'John M.', 'Grace N.', 'David O.']
+
+function selectTerminal(id: string) {
+  terminalId.value = id
+}
+
+function selectAttendant(name: string) {
+  agentName.value = name
+}
 
 function handleLogin() {
   if (!agentName.value.trim()) {
-    error.value = 'Please enter an attendant / cashier name'
+    error.value = 'Please enter an attendant or cashier name'
     return
   }
   if (!terminalId.value.trim()) {
-    error.value = 'Please select or enter a terminal ID'
+    error.value = 'Please select a terminal station'
     return
   }
 
@@ -38,85 +48,140 @@ function handleLogin() {
 </script>
 
 <template>
-  <div class="pos-container py-4 max-w-md mx-auto">
-    <div class="bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden">
-      <!-- Header -->
-      <div class="bg-gradient-to-r from-emerald-800 to-teal-900 text-white p-6 text-center">
-        <div class="w-14 h-14 bg-emerald-700/80 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-inner">
-          <i class="fa-solid fa-tree text-2xl text-amber-300"></i>
+  <div class="pos-container py-4 px-3 max-w-md mx-auto">
+    <div class="bg-white border border-[#E8E6E1] rounded-2xl shadow-xl overflow-hidden">
+      <!-- Premium Abja Brand Header -->
+      <div class="bg-gradient-to-b from-[#1C2331] via-[#1E2738] to-[#121722] text-white p-6 text-center relative border-b-2 border-[#9E8F70]">
+        <div class="inline-flex items-center justify-center bg-white px-4 py-2 rounded-xl shadow-md mb-3">
+          <img src="/abja-logo.png" alt="Abja Parks" class="h-8 w-auto object-contain" />
         </div>
-        <h1 class="text-xl font-black tracking-tight">Abja Parks POS</h1>
-        <p class="text-xs text-emerald-200 mt-1 font-medium">Cashier Shift & Terminal Sign-In</p>
+        <h1 class="text-base font-black tracking-tight text-white uppercase">POS Terminal Station</h1>
+        <p class="text-xs text-[#D4C7AC] mt-0.5 font-semibold">Cashier Shift & Gate Register Setup</p>
+
+        <!-- Status indicator -->
+        <div class="inline-flex items-center gap-1.5 bg-[#9E8F70]/20 border border-[#9E8F70]/40 px-2.5 py-1 rounded-full text-[10px] font-bold text-[#EFECE6] mt-3">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          YoTicket Gateway Connected
+        </div>
       </div>
 
-      <!-- Form -->
-      <form @submit.prevent="handleLogin" class="p-6 space-y-4">
+      <!-- Form Body -->
+      <form @submit.prevent="handleLogin" class="p-5 space-y-4">
         <!-- Error Alert -->
-        <div v-if="error" class="bg-red-50 text-red-700 text-xs font-semibold p-3 rounded-lg border border-red-200">
-          {{ error }}
+        <div v-if="error" class="bg-rose-50 text-rose-700 text-xs font-bold p-3 rounded-xl border border-rose-200 flex items-center gap-2">
+          <i class="fa-solid fa-circle-exclamation shrink-0"></i>
+          <span>{{ error }}</span>
         </div>
 
-        <!-- Attendant Name -->
+        <!-- Terminal / Station Selector Grid -->
         <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">
+          <label class="block text-xs font-black uppercase tracking-wider text-[#1C2331] mb-2 flex items-center justify-between">
+            <span>Terminal Station</span>
+            <span class="text-[10px] font-bold text-[#9E8F70] lowercase">{{ terminalId }}</span>
+          </label>
+          <div class="grid grid-cols-2 gap-2">
+            <button
+              v-for="t in terminals"
+              :key="t.id"
+              type="button"
+              @click="selectTerminal(t.id)"
+              class="p-2.5 rounded-xl border text-left transition flex flex-col justify-between"
+              :class="[
+                terminalId === t.id
+                  ? 'bg-[#1C2331] text-white border-[#1C2331] shadow-md ring-2 ring-[#9E8F70]'
+                  : 'bg-[#F8F7F4] text-[#1C2331] border-[#E8E6E1] hover:border-[#9E8F70]/60'
+              ]"
+            >
+              <div class="flex items-center justify-between w-full mb-1">
+                <i :class="['fa-solid', t.icon, terminalId === t.id ? 'text-[#D4C7AC]' : 'text-[#9E8F70]']"></i>
+                <span
+                  class="text-[9px] font-black uppercase px-1.5 py-0.5 rounded"
+                  :class="[
+                    terminalId === t.id ? 'bg-[#9E8F70]/30 text-[#EFECE6]' : 'bg-slate-200/70 text-slate-600'
+                  ]"
+                >
+                  {{ t.id }}
+                </span>
+              </div>
+              <div class="text-xs font-bold tracking-tight leading-tight">{{ t.name }}</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Attendant / Cashier Name -->
+        <div>
+          <label class="block text-xs font-black uppercase tracking-wider text-[#1C2331] mb-1.5">
             Attendant / Cashier Name
           </label>
-          <div class="relative">
+          <div class="relative mb-2">
             <i class="fa-solid fa-user absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
             <input
               v-model="agentName"
               type="text"
               required
               placeholder="e.g. Sarah / John"
-              class="w-full pl-8 pr-3 py-2.5 text-xs font-medium bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-emerald-500 outline-none transition"
+              class="w-full pl-8 pr-3 py-2.5 text-xs font-bold bg-[#F8F7F4] text-[#1C2331] border border-[#E8E6E1] rounded-xl focus:bg-white focus:ring-2 focus:ring-[#9E8F70] focus:border-transparent outline-none transition"
             />
+          </div>
+
+          <!-- Quick Name Chips -->
+          <div class="flex flex-wrap gap-1.5">
+            <button
+              v-for="name in quickAttendants"
+              :key="name"
+              type="button"
+              @click="selectAttendant(name)"
+              class="text-[10px] font-bold px-2 py-1 rounded-lg border transition"
+              :class="[
+                agentName === name
+                  ? 'bg-[#9E8F70] text-white border-[#9E8F70]'
+                  : 'bg-[#F8F7F4] text-slate-600 border-[#E8E6E1] hover:bg-slate-100'
+              ]"
+            >
+              {{ name }}
+            </button>
           </div>
         </div>
 
-        <!-- Terminal ID Selection -->
+        <!-- Security PIN (Numeric Keyboard) -->
         <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">
-            Terminal / Gate Station
-          </label>
-          <select
-            v-model="terminalId"
-            class="w-full px-3 py-2.5 text-xs font-medium bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-emerald-500 outline-none transition"
-          >
-            <option v-for="t in terminals" :key="t.id" :value="t.id">
-              {{ t.name }} ({{ t.id }})
-            </option>
-          </select>
-        </div>
-
-        <!-- Security Passcode / PIN (Optional) -->
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">
-            Shift PIN (Optional)
+          <label class="block text-xs font-black uppercase tracking-wider text-[#1C2331] mb-1.5 flex items-center justify-between">
+            <span>Shift PIN (Optional)</span>
+            <span class="text-[10px] font-normal text-slate-400">4 Digits</span>
           </label>
           <div class="relative">
-            <i class="fa-solid fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <i class="fa-solid fa-shield-halved absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
             <input
               v-model="pin"
               type="password"
+              inputmode="numeric"
+              pattern="[0-9]*"
               maxlength="4"
               placeholder="••••"
-              class="w-full pl-8 pr-3 py-2.5 text-xs font-mono tracking-widest bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-emerald-500 outline-none transition"
+              class="w-full pl-8 pr-3 py-2.5 text-xs font-mono tracking-widest bg-[#F8F7F4] text-[#1C2331] border border-[#E8E6E1] rounded-xl focus:bg-white focus:ring-2 focus:ring-[#9E8F70] focus:border-transparent outline-none transition"
             />
           </div>
         </div>
 
-        <!-- Submit Button -->
+        <!-- Primary Action Button -->
         <button
           type="submit"
-          class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md transition flex items-center justify-center gap-2"
+          class="w-full py-3.5 bg-[#9E8F70] hover:bg-[#8B7C5E] active:scale-98 text-[#1C2331] text-xs font-black uppercase tracking-wider rounded-xl shadow-md transition flex items-center justify-center gap-2"
         >
-          <i class="fa-solid fa-arrow-right-to-bracket"></i>
-          Start Shift & Open Register
+          <i class="fa-solid fa-arrow-right-to-bracket text-sm"></i>
+          <span>Start Shift & Open Register</span>
         </button>
 
-        <!-- Current Shift Status -->
-        <div class="pt-2 text-center text-[11px] text-slate-400">
-          Last active terminal: <span class="font-bold text-slate-600">{{ store.session.terminalId }}</span>
+        <!-- Peripheral & System Status -->
+        <div class="pt-2 border-t border-[#E8E6E1] flex items-center justify-between text-[10px] text-slate-500 font-semibold">
+          <span class="flex items-center gap-1.5">
+            <i class="fa-solid fa-print text-[#9E8F70]"></i>
+            58mm ESC/POS Ready
+          </span>
+          <span class="flex items-center gap-1.5">
+            <i class="fa-solid fa-wifi text-emerald-600"></i>
+            Cloud Sync Active
+          </span>
         </div>
       </form>
     </div>

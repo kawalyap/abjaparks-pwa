@@ -1,94 +1,111 @@
 <template>
-  <div class="receipt-page">
+  <div class="pos-container max-w-md mx-auto py-4 px-3">
     <div class="receipt-wrapper">
       <!-- Visible Screen Receipt Card -->
-      <div class="receipt-card">
-        <div class="receipt-header">
-          <div class="receipt-logo-wrap">
-            <img src="/abja-logo.png" alt="Abja Parks" class="receipt-brand-logo" />
+      <div class="bg-white border border-[#E8E6E1] rounded-3xl shadow-xl overflow-hidden">
+        <!-- Brand Header -->
+        <div class="bg-gradient-to-b from-[#1C2331] via-[#1E2738] to-[#121722] text-white p-5 text-center relative border-b-2 border-[#9E8F70]">
+          <div class="inline-flex items-center justify-center bg-white px-3.5 py-1.5 rounded-xl shadow-md mb-2">
+            <img src="/abja-logo.png" alt="Abja Parks" class="h-7 w-auto object-contain" />
           </div>
-          <p class="receipt-sub">Official Entrance Admission Receipt</p>
-          <div class="status-pill">
-            <i class="fa-solid fa-check"></i>
+          <p class="text-xs text-[#D4C7AC] font-bold">Official Entrance Admission Receipt</p>
+          <div class="inline-flex items-center gap-1.5 bg-[#9E8F70]/20 border border-[#9E8F70]/40 px-3 py-0.5 rounded-full text-[10px] font-black uppercase text-[#EFECE6] mt-2 tracking-wider">
+            <i class="fa-solid fa-circle-check text-emerald-400"></i>
             <span>PAID & CONFIRMED</span>
           </div>
         </div>
 
-        <div class="receipt-body">
-          <div class="receipt-amount-box">
-            <span class="currency">UGX</span>
-            <span class="amount">{{ (txData.totalAmount || 0).toLocaleString() }}</span>
+        <!-- Receipt Body -->
+        <div class="p-5 space-y-4">
+          <!-- Total Amount Card -->
+          <div class="bg-[#F8F7F4] border border-[#E8E6E1] rounded-2xl p-3.5 text-center">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mr-1">UGX</span>
+            <span class="text-2xl font-black text-[#1C2331] tracking-tight">
+              {{ (txData.totalAmount || 0).toLocaleString() }}
+            </span>
           </div>
 
-          <div class="meta-list">
-            <div class="meta-row">
-              <span class="label">Receipt No</span>
-              <strong class="value">{{ txData.receiptNumber }}</strong>
+          <!-- Transaction Breakdown Table -->
+          <div class="bg-[#F8F7F4] border border-[#E8E6E1] rounded-2xl p-3.5 space-y-2 text-xs">
+            <div class="flex justify-between items-center text-slate-500 font-medium">
+              <span>Receipt No</span>
+              <strong class="font-mono text-[#1C2331]">{{ txData.receiptNumber }}</strong>
             </div>
-            <div class="meta-row">
-              <span class="label">Ticket Category</span>
-              <strong class="value">{{ txData.categoryName }} (x{{ txData.quantity }})</strong>
+            <div class="flex justify-between items-center text-slate-500 font-medium">
+              <span>Ticket Category</span>
+              <strong class="text-[#1C2331]">{{ txData.categoryName }} (x{{ txData.quantity }})</strong>
             </div>
-            <div class="meta-row">
-              <span class="label">Payment Method</span>
-              <strong class="value">MTN / Airtel Mobile Money</strong>
+            <div class="flex justify-between items-center text-slate-500 font-medium">
+              <span>Payment Method</span>
+              <strong class="text-[#1C2331]">Mobile Money Push</strong>
             </div>
-            <div class="meta-row">
-              <span class="label">Customer Phone</span>
-              <strong class="value">{{ txData.momoNumber }}</strong>
+            <div class="flex justify-between items-center text-slate-500 font-medium">
+              <span>Customer MoMo</span>
+              <strong class="font-mono text-[#1C2331]">{{ txData.momoNumber }}</strong>
             </div>
-            <div v-if="txData.customerName" class="meta-row">
-              <span class="label">Customer Name</span>
-              <strong class="value">{{ txData.customerName }}</strong>
+            <div v-if="txData.customerName" class="flex justify-between items-center text-slate-500 font-medium">
+              <span>Customer Name</span>
+              <strong class="text-[#1C2331]">{{ txData.customerName }}</strong>
             </div>
-            <div v-if="txData.paymentRef" class="meta-row">
-              <span class="label">Payment Ref</span>
-              <strong class="value text-xs">{{ txData.paymentRef }}</strong>
+            <div v-if="txData.paymentRef" class="flex justify-between items-center text-slate-500 font-medium">
+              <span>Payment Ref</span>
+              <strong class="font-mono text-[11px] text-slate-700 truncate max-w-[180px]">{{ txData.paymentRef }}</strong>
             </div>
-            <div class="meta-row">
-              <span class="label">Date & Time</span>
-              <strong class="value">{{ txData.dateStr }}</strong>
+            <div class="flex justify-between items-center text-slate-500 font-medium">
+              <span>Date & Time</span>
+              <strong class="text-[#1C2331]">{{ txData.dateStr }}</strong>
             </div>
-            <div class="meta-row">
-              <span class="label">Terminal / Agent</span>
-              <strong class="value">{{ txData.terminalId }} • {{ txData.agentName }}</strong>
+            <div class="flex justify-between items-center text-slate-500 font-medium">
+              <span>Terminal / Agent</span>
+              <strong class="text-[#1C2331]">{{ txData.terminalId }} &bull; {{ txData.agentName }}</strong>
             </div>
           </div>
 
-          <!-- QR Code Section for Customer Scan -->
-          <div class="qr-box">
-            <p class="qr-instruction">
-              <i class="fa-solid fa-camera"></i>
-              Scan QR code with smartphone to view / download digital e-receipt
+          <!-- Customer Smartphone QR Scan Box -->
+          <div class="bg-[#F8F7F4] border border-[#E8E6E1] rounded-2xl p-4 text-center space-y-2">
+            <p class="text-[11px] font-bold text-slate-600 flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-camera text-[#9E8F70]"></i>
+              Scan with phone camera for digital receipt
             </p>
-            <div class="qr-canvas-wrapper" v-if="qrImage">
-              <img :src="qrImage" alt="Receipt Verification QR" class="qr-img" />
+            <div v-if="qrImage" class="inline-block p-2 bg-white rounded-xl shadow-xs border border-[#E8E6E1]">
+              <img :src="qrImage" alt="Receipt Verification QR" class="w-32 h-32 mx-auto object-contain" />
             </div>
-            <span class="qr-ref">{{ txData.receiptNumber }}</span>
+            <span class="block text-[10px] font-mono font-black text-slate-500 uppercase">
+              Ref: {{ txData.receiptNumber }}
+            </span>
           </div>
-        </div>
 
-        <!-- POS Action Buttons (Hidden when printing) -->
-        <div class="receipt-actions no-print">
-          <button class="btn-print" @click="handlePrint">
-            <i class="fa-solid fa-print"></i>
-            Print Thermal Receipt
-          </button>
+          <!-- POS Action Buttons (Hidden when printing) -->
+          <div class="space-y-2 no-print pt-1">
+            <button
+              class="w-full py-3.5 bg-[#9E8F70] hover:bg-[#8B7C5E] text-[#1C2331] text-xs font-black uppercase tracking-wider rounded-xl shadow-md transition flex items-center justify-center gap-2"
+              @click="handlePrint"
+            >
+              <i class="fa-solid fa-print text-sm"></i>
+              <span>Print 58mm Thermal Receipt</span>
+            </button>
 
-          <div class="action-grid-2">
-            <button class="btn-email" @click="showEmailModal = true">
-              <i class="fa-solid fa-envelope"></i>
-              Email E-Receipt
-            </button>
-            <button class="btn-next" @click="handleNextTicket">
-              <i class="fa-solid fa-plus"></i>
-              Next Ticket
-            </button>
+            <div class="grid grid-cols-2 gap-2">
+              <button
+                class="py-2.5 bg-white hover:bg-slate-50 text-[#1C2331] border border-[#E8E6E1] rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition"
+                @click="showEmailModal = true"
+              >
+                <i class="fa-solid fa-envelope text-[#9E8F70]"></i>
+                <span>Email E-Receipt</span>
+              </button>
+              <button
+                class="py-2.5 bg-[#1C2331] hover:bg-[#121722] text-white rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-1.5 transition shadow-xs"
+                @click="handleNextTicket"
+              >
+                <i class="fa-solid fa-plus text-[#9E8F70]"></i>
+                <span>Next Ticket</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Hidden Thermal Receipt Layout (Targets 58mm / 80mm printers directly) -->
+      <!-- Hidden Thermal Receipt Layout (Directly targets 58mm / 80mm printers) -->
       <div class="thermal-receipt-print-area">
         <div style="text-align: center; margin-bottom: 6px;">
           <h2 style="font-size: 14px; font-weight: bold; margin: 0;">ABJA PARKS</h2>
@@ -116,48 +133,65 @@
     </div>
 
     <!-- Email Dispatch Modal -->
-    <div v-if="showEmailModal" class="modal-backdrop">
-      <div class="modal-card">
-        <div class="modal-header">
-          <h3>
-            <i class="fa-solid fa-paper-plane text-primary"></i>
-            Send E-Receipt to Email
-          </h3>
-          <button class="close-btn" @click="showEmailModal = false">
-            <i class="fa-solid fa-xmark"></i>
+    <div
+      v-if="showEmailModal"
+      class="fixed inset-0 z-50 bg-[#1C2331]/70 backdrop-blur-xs flex items-center justify-center p-3 animate-fade-in"
+      @click.self="showEmailModal = false"
+    >
+      <div class="bg-white rounded-2xl max-w-sm w-full p-4 shadow-2xl border border-[#E8E6E1] space-y-3">
+        <div class="flex items-center justify-between pb-2 border-b border-[#E8E6E1]">
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 bg-[#1C2331] text-[#9E8F70] rounded-lg flex items-center justify-center text-xs font-black">
+              <i class="fa-solid fa-paper-plane"></i>
+            </div>
+            <h3 class="text-xs font-black uppercase text-[#1C2331]">Send E-Receipt</h3>
+          </div>
+          <button @click="showEmailModal = false" class="text-slate-400 hover:text-slate-700">
+            <i class="fa-solid fa-xmark text-base"></i>
           </button>
         </div>
 
-        <div class="modal-body">
-          <p class="modal-desc">
-            The customer will instantly receive their official verified digital receipt in their inbox.
-          </p>
-          <div class="form-group">
-            <label class="modal-label">Customer Email Address</label>
-            <input
-              type="email"
-              v-model="emailInput"
-              placeholder="customer@example.com"
-              class="modal-input"
-              autofocus
-            />
-          </div>
+        <p class="text-xs text-slate-500 font-medium">
+          The customer will instantly receive their verified PDF & digital entry receipt.
+        </p>
 
-          <div v-if="emailSuccess" class="alert-success">
-            <i class="fa-solid fa-circle-check"></i>
-            {{ emailSuccess }}
-          </div>
-          <div v-if="emailError" class="alert-error">
-            <i class="fa-solid fa-circle-exclamation"></i>
-            {{ emailError }}
-          </div>
+        <div>
+          <label class="block text-[11px] font-black uppercase tracking-wider text-[#1C2331] mb-1">
+            Customer Email
+          </label>
+          <input
+            type="email"
+            v-model="emailInput"
+            placeholder="customer@example.com"
+            class="w-full px-3 py-2 text-xs border border-[#E8E6E1] rounded-xl focus:ring-2 focus:ring-[#9E8F70] outline-none"
+            autofocus
+          />
         </div>
 
-        <div class="modal-footer">
-          <button class="btn-cancel" @click="showEmailModal = false">Close</button>
-          <button class="btn-send" :disabled="!isEmailValid || isSendingEmail" @click="handleSendEmail">
-            <span v-if="isSendingEmail"><i class="fa-solid fa-spinner fa-spin"></i> Sending...</span>
-            <span v-else><i class="fa-solid fa-envelope"></i> Send Receipt</span>
+        <div v-if="emailSuccess" class="bg-emerald-50 text-emerald-800 text-xs font-bold p-2.5 rounded-xl border border-emerald-200 flex items-center gap-1.5">
+          <i class="fa-solid fa-circle-check text-emerald-600"></i>
+          <span>{{ emailSuccess }}</span>
+        </div>
+
+        <div v-if="emailError" class="bg-rose-50 text-rose-800 text-xs font-bold p-2.5 rounded-xl border border-rose-200 flex items-center gap-1.5">
+          <i class="fa-solid fa-circle-exclamation text-rose-600"></i>
+          <span>{{ emailError }}</span>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-1">
+          <button
+            class="px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl"
+            @click="showEmailModal = false"
+          >
+            Cancel
+          </button>
+          <button
+            class="px-4 py-2 text-xs font-black uppercase tracking-wider text-[#1C2331] bg-[#9E8F70] hover:bg-[#8B7C5E] rounded-xl shadow-xs disabled:opacity-50 transition"
+            :disabled="!isEmailValid || isSendingEmail"
+            @click="handleSendEmail"
+          >
+            <span v-if="isSendingEmail"><i class="fa-solid fa-spinner fa-spin mr-1"></i> Sending...</span>
+            <span v-else><i class="fa-solid fa-paper-plane mr-1"></i> Send Now</span>
           </button>
         </div>
       </div>
@@ -261,360 +295,6 @@ function handleNextTicket() {
 </script>
 
 <style scoped>
-.receipt-page {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  padding: 24px;
-}
-
-.receipt-wrapper {
-  max-width: 440px;
-  width: 100%;
-}
-
-.receipt-card {
-  background: var(--card-bg);
-  border-radius: var(--ax-radius-lg);
-  box-shadow: var(--ax-shadow-high);
-  border: 1px solid var(--border);
-  overflow: hidden;
-}
-
-.receipt-header {
-  background: linear-gradient(135deg, #1C2331 0%, #121722 100%);
-  border-bottom: 2px solid var(--accent);
-  color: #ffffff;
-  padding: 20px 24px;
-  text-align: center;
-}
-
-.receipt-logo-wrap {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: #ffffff;
-  padding: 6px 14px;
-  border-radius: var(--ax-radius-xs);
-  margin-bottom: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-}
-
-.receipt-brand-logo {
-  height: 30px;
-  width: auto;
-  object-fit: contain;
-}
-
-.receipt-sub {
-  font-size: 12px;
-  opacity: 0.85;
-  margin: 2px 0 12px;
-}
-
-.status-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: #10b981;
-  color: #ffffff;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-}
-
-.receipt-body {
-  padding: 24px;
-}
-
-.receipt-amount-box {
-  background: #f8fafc;
-  border: 1px dashed #cbd5e1;
-  border-radius: 12px;
-  padding: 14px;
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.receipt-amount-box .currency {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text-muted);
-  margin-right: 4px;
-}
-
-.receipt-amount-box .amount {
-  font-size: 28px;
-  font-weight: 800;
-  color: var(--primary);
-}
-
-.meta-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 20px;
-}
-
-.meta-row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 13px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid #f1f5f9;
-}
-
-.meta-row .label {
-  color: var(--text-muted);
-}
-
-.meta-row .value {
-  color: var(--text-main);
-  text-align: right;
-}
-
-/* QR Box */
-.qr-box {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 14px;
-  padding: 16px;
-  text-align: center;
-  margin-top: 16px;
-}
-
-.qr-instruction {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin-bottom: 10px;
-  line-height: 1.3;
-}
-
-.qr-instruction i {
-  color: var(--primary);
-  margin-right: 4px;
-}
-
-.qr-canvas-wrapper {
-  display: inline-block;
-  padding: 8px;
-  background: #ffffff;
-  border: 1px solid var(--border);
-  border-radius: var(--ax-radius-sm);
-  box-shadow: var(--ax-shadow-low);
-}
-
-.qr-img {
-  width: 140px;
-  height: 140px;
-  display: block;
-}
-
-.qr-ref {
-  display: block;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text-muted);
-  margin-top: 6px;
-  font-family: monospace;
-}
-
-/* Actions */
-.receipt-actions {
-  padding: 16px 24px 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.btn-print {
-  width: 100%;
-  background: var(--accent);
-  color: #1C2331;
-  padding: 14px;
-  border-radius: var(--ax-radius-md);
-  box-shadow: var(--ax-shadow-med);
-  font-size: 15px;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: all var(--duration-fast, 125ms) ease;
-}
-
-.btn-print:hover {
-  background: var(--accent-hover);
-  color: #ffffff;
-  transform: translateY(-1px);
-}
-
-.action-grid-2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-.btn-email {
-  background: var(--bg-app);
-  color: var(--primary);
-  border: 1px solid var(--border);
-  padding: 12px;
-  border-radius: var(--ax-radius-sm);
-  font-size: 13px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  transition: all var(--duration-fast, 125ms) ease;
-}
-
-.btn-email:hover {
-  background: #e2e8f0;
-}
-
-.btn-next {
-  background: var(--accent);
-  color: #000000;
-  padding: 12px;
-  border-radius: var(--ax-radius-sm);
-  box-shadow: var(--ax-shadow-low);
-  font-size: 13px;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  transition: all var(--duration-fast, 125ms) ease;
-}
-
-.btn-next:hover {
-  background: var(--accent-hover);
-  transform: translateY(-1px);
-}
-
-/* Modal */
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-  z-index: 200;
-}
-
-.modal-card {
-  background: #ffffff;
-  border-radius: 16px;
-  max-width: 440px;
-  width: 100%;
-  padding: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-}
-
-.modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-
-.modal-header h3 {
-  font-size: 16px;
-  font-weight: 700;
-}
-
-.close-btn {
-  background: transparent;
-  font-size: 18px;
-  color: #94a3b8;
-}
-
-.modal-desc {
-  font-size: 13px;
-  color: var(--text-muted);
-  margin-bottom: 14px;
-}
-
-.modal-label {
-  font-size: 12px;
-  font-weight: 600;
-  display: block;
-  margin-bottom: 6px;
-}
-
-.modal-input {
-  width: 100%;
-  padding: 10px 12px;
-  border: 2px solid #cbd5e1;
-  border-radius: 8px;
-  font-size: 14px;
-  outline: none;
-}
-
-.modal-input:focus {
-  border-color: var(--primary);
-}
-
-.alert-success {
-  background: #ecfdf5;
-  color: #065f46;
-  padding: 10px;
-  border-radius: 8px;
-  font-size: 12px;
-  margin-top: 10px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.alert-error {
-  background: #fef2f2;
-  color: #991b1b;
-  padding: 10px;
-  border-radius: 8px;
-  font-size: 12px;
-  margin-top: 10px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 18px;
-}
-
-.btn-cancel {
-  padding: 10px 16px;
-  background: #f1f5f9;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.btn-send {
-  padding: 10px 18px;
-  background: var(--primary);
-  color: #ffffff;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.btn-send:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* Hidden Thermal Print Area by default on screen */
 .thermal-receipt-print-area {
   display: none;
 }

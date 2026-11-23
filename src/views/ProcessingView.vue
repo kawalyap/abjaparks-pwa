@@ -1,54 +1,104 @@
 <template>
-  <div class="processing-page">
-    <div class="status-card">
+  <div class="pos-container max-w-md mx-auto py-6 px-3 flex items-center justify-center min-h-[80vh]">
+    <div class="bg-white border border-[#E8E6E1] rounded-3xl max-w-sm w-full p-6 shadow-2xl text-center space-y-5">
+      <!-- Brand Logo Mini Header -->
+      <div class="flex items-center justify-center">
+        <div class="bg-[#F8F7F4] border border-[#E8E6E1] px-3 py-1.5 rounded-xl shadow-2xs">
+          <img src="/abja-logo.png" alt="Abja Parks" class="h-6 object-contain" />
+        </div>
+      </div>
+
       <!-- Animated Status Icon -->
-      <div class="pulse-container" :class="{ success: isSuccess, failed: isFailed }">
-        <div v-if="!isSuccess && !isFailed" class="pulse-ring"></div>
-        <div class="pulse-core">
-          <i v-if="isSuccess" class="fa-solid fa-circle-check text-success"></i>
-          <i v-else-if="isFailed" class="fa-solid fa-circle-xmark text-danger"></i>
-          <i v-else class="fa-solid fa-mobile-screen-button text-primary fa-bounce"></i>
+      <div class="relative w-24 h-24 mx-auto flex items-center justify-center">
+        <!-- Ripple rings -->
+        <div
+          v-if="!isSuccess && !isFailed"
+          class="absolute inset-0 rounded-full border-4 border-[#9E8F70]/30 animate-ping"
+        ></div>
+        <div
+          v-if="!isSuccess && !isFailed"
+          class="absolute inset-2 rounded-full border-2 border-[#9E8F70]/60 animate-pulse"
+        ></div>
+
+        <!-- Central core -->
+        <div
+          class="w-20 h-20 rounded-full flex items-center justify-center text-3xl shadow-lg relative z-10 transition-all duration-300"
+          :class="[
+            isSuccess ? 'bg-emerald-600 text-white' :
+            isFailed ? 'bg-rose-600 text-white' :
+            'bg-[#1C2331] text-[#9E8F70]'
+          ]"
+        >
+          <i v-if="isSuccess" class="fa-solid fa-circle-check"></i>
+          <i v-else-if="isFailed" class="fa-solid fa-circle-xmark"></i>
+          <i v-else class="fa-solid fa-mobile-screen-button fa-shake"></i>
         </div>
       </div>
 
       <!-- Header & Instructions -->
-      <h2 class="status-heading">{{ statusTitle }}</h2>
-      <p class="status-subtext">{{ statusMessage }}</p>
+      <div class="space-y-1">
+        <h2 class="text-base font-black text-[#1C2331] uppercase tracking-tight">
+          {{ statusTitle }}
+        </h2>
+        <p class="text-xs text-slate-500 font-medium leading-relaxed">
+          {{ statusMessage }}
+        </p>
+      </div>
 
-      <!-- Amount Details -->
-      <div class="ticket-summary-box">
-        <div class="summary-line">
-          <span>Ticket:</span>
-          <strong>{{ posStore.activeTransaction?.category_name || 'Entrance Ticket' }} (x{{ posStore.activeTransaction?.quantity || 1 }})</strong>
+      <!-- Amount Details Ticket -->
+      <div class="bg-[#F8F7F4] border border-[#E8E6E1] rounded-2xl p-4 text-left space-y-2 text-xs">
+        <div class="flex justify-between items-center text-slate-500 font-semibold">
+          <span>Admissions</span>
+          <strong class="text-[#1C2331]">
+            {{ posStore.activeTransaction?.category_name || 'Entrance Ticket' }} (x{{ posStore.activeTransaction?.quantity || 1 }})
+          </strong>
         </div>
-        <div class="summary-line">
-          <span>Total Amount:</span>
-          <strong class="highlight-amount">UGX {{ (posStore.activeTransaction?.total_amount || 0).toLocaleString() }}</strong>
+
+        <div class="flex justify-between items-center pt-1 border-t border-[#E8E6E1]">
+          <span class="text-slate-500 font-semibold">Total Amount</span>
+          <strong class="text-base font-black text-[#1C2331]">
+            UGX {{ (posStore.activeTransaction?.total_amount || 0).toLocaleString() }}
+          </strong>
         </div>
-        <div class="summary-line">
-          <span>Customer Phone:</span>
-          <strong>{{ maskedPhone }}</strong>
+
+        <div class="flex justify-between items-center pt-1 border-t border-[#E8E6E1]">
+          <span class="text-slate-500 font-semibold">MoMo Handset</span>
+          <span class="font-mono font-bold text-[#1C2331] bg-white px-2 py-0.5 rounded border border-[#E8E6E1]">
+            {{ maskedPhone }}
+          </span>
         </div>
-        <div v-if="posStore.activeTransaction?.receipt_number" class="summary-line">
-          <span>Receipt No:</span>
-          <code>{{ posStore.activeTransaction?.receipt_number }}</code>
+
+        <div v-if="posStore.activeTransaction?.receipt_number" class="flex justify-between items-center pt-1 border-t border-[#E8E6E1]">
+          <span class="text-slate-500 font-semibold">Receipt No</span>
+          <code class="text-[10px] font-mono font-bold text-slate-700">{{ posStore.activeTransaction?.receipt_number }}</code>
         </div>
       </div>
 
       <!-- Action Buttons -->
-      <div class="button-row">
-        <button v-if="isSuccess" class="btn-primary" @click="goToReceipt">
+      <div class="space-y-2 pt-1">
+        <button
+          v-if="isSuccess"
+          class="w-full py-3.5 bg-[#9E8F70] hover:bg-[#8B7C5E] text-[#1C2331] text-xs font-black uppercase tracking-wider rounded-xl shadow-md transition flex items-center justify-center gap-2"
+          @click="goToReceipt"
+        >
           <i class="fa-solid fa-receipt"></i>
-          View & Print Receipt
+          <span>View & Print Receipt</span>
         </button>
 
-        <button v-else-if="isFailed" class="btn-retry" @click="handleRetry">
-          <i class="fa-solid fa-rotate-right"></i>
-          Try Again
+        <button
+          v-else-if="isFailed"
+          class="w-full py-3 bg-[#1C2331] hover:bg-[#121722] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md transition flex items-center justify-center gap-2"
+          @click="handleRetry"
+        >
+          <i class="fa-solid fa-rotate-right text-[#9E8F70]"></i>
+          <span>Try Again</span>
         </button>
 
-        <button class="btn-secondary" @click="handleCancel">
-          {{ isSuccess ? 'New Ticket' : 'Cancel' }}
+        <button
+          class="w-full py-2.5 bg-[#F8F7F4] hover:bg-slate-100 text-slate-600 text-xs font-bold rounded-xl border border-[#E8E6E1] transition"
+          @click="handleCancel"
+        >
+          {{ isSuccess ? 'New Ticket' : 'Cancel Transaction' }}
         </button>
       </div>
     </div>
@@ -79,9 +129,9 @@ const statusTitle = computed(() => {
 })
 
 const statusMessage = computed(() => {
-  if (isSuccess.value) return 'Payment was approved and settled successfully.'
+  if (isSuccess.value) return 'Mobile Money payment confirmed. Admission granted.'
   if (isFailed.value) return posStore.pollError || posStore.activeStatus?.message || 'Payment prompt was canceled or timed out.'
-  return `USSD prompt sent to ${maskedPhone.value}. Please instruct the customer to approve on their handset.`
+  return `Prompt dispatched to ${maskedPhone.value}. Instruct the customer to authorize with their mobile money PIN.`
 })
 
 // Auto navigate to receipt upon successful settlement
@@ -112,158 +162,3 @@ function handleCancel() {
   router.push({ name: 'pos.collect' })
 }
 </script>
-
-<style scoped>
-.processing-page {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-}
-
-.status-card {
-  background: var(--card-bg);
-  border-radius: 20px;
-  max-width: 480px;
-  width: 100%;
-  padding: 32px 24px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-  border: 1px solid var(--border);
-  text-align: center;
-}
-
-/* Pulsing Wave Animation */
-.pulse-container {
-  width: 90px;
-  height: 90px;
-  margin: 0 auto 20px;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.pulse-core {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: #f1f5f9;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 36px;
-  z-index: 2;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
-}
-
-.pulse-ring {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  border: 3px solid var(--primary);
-  animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
-}
-
-@keyframes pulse-ring {
-  0% {
-    transform: scale(0.85);
-    opacity: 0.8;
-  }
-  100% {
-    transform: scale(1.4);
-    opacity: 0;
-  }
-}
-
-.text-primary { color: var(--primary); }
-.text-success { color: var(--success); }
-.text-danger { color: var(--danger); }
-
-.status-heading {
-  font-size: 22px;
-  font-weight: 800;
-  margin-bottom: 8px;
-  color: var(--text-main);
-}
-
-.status-subtext {
-  font-size: 14px;
-  color: var(--text-muted);
-  line-height: 1.4;
-  margin-bottom: 24px;
-}
-
-.ticket-summary-box {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 24px;
-  text-align: left;
-}
-
-.summary-line {
-  display: flex;
-  justify-content: space-between;
-  font-size: 13px;
-  padding: 6px 0;
-  border-bottom: 1px solid #f1f5f9;
-}
-
-.summary-line:last-child {
-  border-bottom: none;
-}
-
-.summary-line span {
-  color: var(--text-muted);
-}
-
-.highlight-amount {
-  color: var(--primary);
-  font-size: 16px;
-  font-weight: 800;
-}
-
-.button-row {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.btn-primary {
-  background: var(--accent);
-  color: #000000;
-  padding: 14px 20px;
-  border-radius: 12px;
-  font-size: 15px;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.btn-retry {
-  background: var(--primary);
-  color: #ffffff;
-  padding: 14px 20px;
-  border-radius: 12px;
-  font-size: 15px;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.btn-secondary {
-  background: #f1f5f9;
-  color: var(--text-muted);
-  padding: 12px;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 700;
-}
-</style>

@@ -126,117 +126,125 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="pos-container space-y-3">
-    <!-- Top Header & Controls -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+  <div class="pos-container max-w-2xl mx-auto py-3 px-3 space-y-3">
+    <!-- Top Header -->
+    <div class="flex items-center justify-between gap-2">
       <div>
-        <h1 class="text-base sm:text-lg font-black text-slate-800 flex items-center gap-2">
-          <i class="fa-solid fa-clock-rotate-left text-emerald-600"></i>
+        <h1 class="text-base font-black text-[#1C2331] uppercase tracking-tight flex items-center gap-2">
+          <i class="fa-solid fa-clock-rotate-left text-[#9E8F70]"></i>
           Shift History
         </h1>
-        <p class="text-[11px] text-slate-500">Reprint 58mm receipts & resend e-receipts</p>
+        <p class="text-[11px] text-slate-500 font-medium">Reprint 58mm receipts & resend e-receipts</p>
       </div>
 
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1.5">
         <input
           v-model="selectedDate"
           type="date"
           @change="loadData"
-          class="px-3 py-1.5 text-xs font-semibold bg-white border border-slate-200 rounded-lg shadow-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+          class="px-2.5 py-1.5 text-xs font-bold bg-white text-[#1C2331] border border-[#E8E6E1] rounded-xl shadow-xs focus:ring-2 focus:ring-[#9E8F70] outline-none"
         />
         <button
           @click="loadData"
-          class="px-3 py-1.5 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg shadow-sm flex items-center gap-1.5 transition"
+          class="p-2 text-xs font-bold text-[#1C2331] bg-white hover:bg-slate-50 border border-[#E8E6E1] rounded-xl shadow-xs transition"
+          title="Refresh transactions"
         >
           <i class="fa-solid fa-rotate-right" :class="{ 'fa-spin': isLoading }"></i>
-          Refresh
         </button>
       </div>
     </div>
 
-    <!-- Quick Shift Summary Banner -->
-    <div class="grid grid-cols-3 gap-2 sm:gap-3 bg-gradient-to-r from-[#1C2331] to-[#252E40] text-white p-3.5 rounded-xl shadow-sm border-l-4 border-[#9E8F70]">
-      <div class="border-r border-slate-700/60 pr-2">
-        <div class="text-[10px] uppercase font-bold text-[#D4C7AC] tracking-wider">Shift Revenue</div>
-        <div class="text-base sm:text-lg font-black tracking-tight text-[#E2D7C0]">
-          {{ formatCurrency(summaryStats.revenue) }}
+    <!-- Quick Shift Summary Banner (Abja Brand Gradient) -->
+    <div class="bg-gradient-to-r from-[#1C2331] via-[#242D3E] to-[#1C2331] text-white p-3.5 rounded-2xl shadow-md border-l-4 border-[#9E8F70]">
+      <div class="grid grid-cols-3 gap-2">
+        <div class="border-r border-slate-700/60 pr-2">
+          <div class="text-[9px] uppercase font-black text-[#D4C7AC] tracking-wider">Shift Revenue</div>
+          <div class="text-sm sm:text-base font-black tracking-tight text-[#FAF9F6] mt-0.5">
+            {{ formatCurrency(summaryStats.revenue) }}
+          </div>
         </div>
-      </div>
-      <div class="border-r border-slate-700/60 pr-2">
-        <div class="text-[10px] uppercase font-bold text-[#D4C7AC] tracking-wider">Paid Tickets</div>
-        <div class="text-base sm:text-lg font-black tracking-tight">
-          {{ summaryStats.tickets }}
+        <div class="border-r border-slate-700/60 pr-2">
+          <div class="text-[9px] uppercase font-black text-[#D4C7AC] tracking-wider">Paid Tickets</div>
+          <div class="text-sm sm:text-base font-black tracking-tight text-white mt-0.5">
+            {{ summaryStats.tickets }}
+          </div>
         </div>
-      </div>
-      <div>
-        <div class="text-[10px] uppercase font-bold text-[#D4C7AC] tracking-wider">Transactions</div>
-        <div class="text-base sm:text-lg font-black tracking-tight">
-          {{ summaryStats.count }}
+        <div>
+          <div class="text-[9px] uppercase font-black text-[#D4C7AC] tracking-wider">Txns</div>
+          <div class="text-sm sm:text-base font-black tracking-tight text-white mt-0.5">
+            {{ summaryStats.count }}
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Search & Filter Bar -->
-    <div class="flex flex-col sm:flex-row gap-2">
-      <div class="relative flex-1">
+    <!-- Search & Filter Controls -->
+    <div class="space-y-2">
+      <div class="relative">
         <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
         <input
           v-model="searchQuery"
           type="text"
           placeholder="Search receipt, phone, code or name..."
-          class="w-full pl-8 pr-3 py-2 text-xs font-medium bg-white border border-slate-200 rounded-lg shadow-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+          class="w-full pl-8 pr-3 py-2 text-xs font-medium bg-white text-[#1C2331] border border-[#E8E6E1] rounded-xl shadow-xs focus:ring-2 focus:ring-[#9E8F70] outline-none"
         />
       </div>
 
-      <div class="flex gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+      <!-- Status Chips -->
+      <div class="flex gap-1.5 overflow-x-auto pb-0.5">
         <button
           v-for="st in ['all', 'paid', 'pending_payment', 'failed']"
           :key="st"
           @click="selectedStatus = st; loadData()"
-          class="px-2.5 py-1.5 text-xs font-bold rounded-lg border transition capitalize whitespace-nowrap"
+          class="px-3 py-1.5 text-[11px] font-black rounded-xl border transition capitalize whitespace-nowrap"
           :class="[
             selectedStatus === st
-              ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
-              : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+              ? 'bg-[#1C2331] text-white border-[#1C2331] shadow-xs'
+              : 'bg-white text-slate-600 border-[#E8E6E1] hover:bg-[#F8F7F4]'
           ]"
         >
-          {{ st.replace('_', ' ') }}
+          <span v-if="st === 'paid'" class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5"></span>
+          <span v-else-if="st === 'pending_payment'" class="inline-block w-1.5 h-1.5 rounded-full bg-amber-400 mr-1.5"></span>
+          <span v-else-if="st === 'failed'" class="inline-block w-1.5 h-1.5 rounded-full bg-rose-400 mr-1.5"></span>
+          {{ st === 'pending_payment' ? 'Pending' : st }}
         </button>
       </div>
     </div>
 
     <!-- Loading State -->
     <div v-if="isLoading" class="py-12 text-center text-slate-400">
-      <i class="fa-solid fa-circle-notch fa-spin text-2xl text-emerald-600 mb-2"></i>
-      <p class="text-xs font-semibold">Loading transactions...</p>
+      <i class="fa-solid fa-circle-notch fa-spin text-2xl text-[#9E8F70] mb-2"></i>
+      <p class="text-xs font-bold text-slate-600">Loading transactions...</p>
     </div>
 
     <!-- Empty State -->
     <div
       v-else-if="filteredItems.length === 0"
-      class="py-12 text-center bg-white border border-slate-200 rounded-xl p-6"
+      class="py-12 text-center bg-white border border-[#E8E6E1] rounded-2xl p-6 shadow-xs"
     >
-      <i class="fa-solid fa-receipt text-3xl text-slate-300 mb-2"></i>
-      <h3 class="text-sm font-bold text-slate-700">No transactions found</h3>
-      <p class="text-xs text-slate-400 mt-1">Try selecting a different date or clearing the filter.</p>
+      <div class="w-12 h-12 bg-[#F8F7F4] text-[#9E8F70] rounded-2xl flex items-center justify-center mx-auto mb-2">
+        <i class="fa-solid fa-receipt text-xl"></i>
+      </div>
+      <h3 class="text-xs font-black text-[#1C2331] uppercase">No transactions found</h3>
+      <p class="text-[11px] text-slate-400 mt-1">Try selecting a different date or clearing your filter.</p>
     </div>
 
-    <!-- Transaction List -->
+    <!-- Transaction List (Mobile-Optimized Cards) -->
     <div v-else class="space-y-2">
       <div
         v-for="item in filteredItems"
         :key="item.id || item.transaction_id"
         @click="openDetail(item)"
-        class="bg-white border border-slate-200 rounded-xl p-3 shadow-xs hover:border-emerald-400 hover:shadow-md transition cursor-pointer flex items-center justify-between gap-3"
+        class="bg-white border border-[#E8E6E1] rounded-xl p-3 shadow-xs hover:border-[#9E8F70] hover:shadow-md transition cursor-pointer flex items-center justify-between gap-3"
       >
-        <div class="flex items-center gap-3 min-w-0">
+        <div class="flex items-center gap-2.5 min-w-0">
           <!-- Status icon circle -->
           <div
-            class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-sm"
+            class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold"
             :class="[
-              item.status === 'paid' ? 'bg-emerald-100 text-emerald-700' :
-              item.status === 'pending_payment' ? 'bg-amber-100 text-amber-700' :
-              'bg-red-100 text-red-700'
+              item.status === 'paid' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
+              item.status === 'pending_payment' ? 'bg-amber-50 text-amber-700 border border-amber-200' :
+              'bg-rose-50 text-rose-700 border border-rose-200'
             ]"
           >
             <i
@@ -251,42 +259,42 @@ onMounted(() => {
 
           <!-- Transaction Info -->
           <div class="min-w-0">
-            <div class="flex items-center gap-2">
-              <span class="text-xs font-black text-slate-800 tracking-tight">
+            <div class="flex items-center gap-1.5">
+              <span class="text-xs font-black text-[#1C2331] tracking-tight">
                 {{ item.receipt_number || item.code }}
               </span>
               <span
-                class="px-1.5 py-0.5 rounded text-[10px] font-black uppercase tracking-wider"
+                class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider"
                 :class="[
-                  item.status === 'paid' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
-                  item.status === 'pending_payment' ? 'bg-amber-50 text-amber-700 border border-amber-200' :
-                  'bg-red-50 text-red-700 border border-red-200'
+                  item.status === 'paid' ? 'bg-emerald-100 text-emerald-800' :
+                  item.status === 'pending_payment' ? 'bg-amber-100 text-amber-800' :
+                  'bg-rose-100 text-rose-800'
                 ]"
               >
                 {{ item.status === 'paid' ? 'Paid' : item.status === 'pending_payment' ? 'Pending' : 'Failed' }}
               </span>
             </div>
 
-            <div class="text-[11px] text-slate-500 font-medium truncate mt-0.5">
-              <span>{{ item.category_name }} &bull; {{ item.quantity }} ticket(s)</span>
-              <span v-if="item.momo_number" class="text-slate-400"> &bull; {{ item.momo_number }}</span>
+            <div class="text-[11px] text-slate-600 font-semibold truncate mt-0.5">
+              <span>{{ item.category_name }} &bull; {{ item.quantity }} tkt(s)</span>
+              <span v-if="item.momo_number" class="text-slate-400 font-mono"> &bull; {{ item.momo_number }}</span>
             </div>
 
-            <div class="text-[10px] text-slate-400 mt-0.5 flex items-center gap-2">
-              <span><i class="fa-regular fa-clock"></i> {{ formatTime(item.created_at) }}</span>
+            <div class="text-[10px] text-slate-400 mt-0.5 flex items-center gap-1.5 font-medium">
+              <span><i class="fa-regular fa-clock text-[9px]"></i> {{ formatTime(item.created_at) }}</span>
               <span v-if="item.agent_name">&bull; {{ item.agent_name }}</span>
             </div>
           </div>
         </div>
 
-        <!-- Amount & Action -->
+        <!-- Amount & Quick Reprint -->
         <div class="text-right shrink-0">
-          <div class="text-sm font-black text-slate-900 tracking-tight">
+          <div class="text-xs sm:text-sm font-black text-[#1C2331] tracking-tight">
             {{ formatCurrency(item.total_amount) }}
           </div>
           <button
             @click.stop="reprintItem(item)"
-            class="mt-1 px-2 py-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-md border border-emerald-200 transition flex items-center gap-1 ml-auto"
+            class="mt-1 px-2.5 py-1 text-[10px] font-black text-[#1C2331] bg-[#F7F5F1] hover:bg-[#9E8F70] hover:text-white rounded-lg border border-[#D5D1C7] transition flex items-center gap-1 ml-auto shadow-2xs"
             title="Reprint 58mm Thermal Receipt"
           >
             <i class="fa-solid fa-print"></i>
@@ -296,104 +304,104 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- Item Detail & Email Modal -->
+    <!-- Receipt Detail & Email Modal -->
     <div
       v-if="selectedItem"
-      class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in"
+      class="fixed inset-0 z-50 bg-[#1C2331]/70 backdrop-blur-xs flex items-center justify-center p-3 animate-fade-in"
       @click.self="closeDetail"
     >
-      <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden border border-slate-100">
-        <!-- Header -->
-        <div class="bg-gradient-to-r from-emerald-800 to-teal-900 text-white p-4 flex items-center justify-between">
+      <div class="bg-white rounded-2xl max-w-sm w-full shadow-2xl overflow-hidden border border-[#E8E6E1]">
+        <!-- Brand Modal Header -->
+        <div class="bg-gradient-to-r from-[#1C2331] via-[#242D3E] to-[#1C2331] text-white p-4 flex items-center justify-between border-b-2 border-[#9E8F70]">
           <div class="flex items-center gap-2">
-            <i class="fa-solid fa-receipt text-amber-300"></i>
-            <h3 class="font-bold text-sm">Receipt #{{ selectedItem.receipt_number || selectedItem.code }}</h3>
+            <div class="bg-white px-2 py-1 rounded-md">
+              <img src="/abja-logo.png" alt="Abja" class="h-4 object-contain" />
+            </div>
+            <h3 class="font-black text-xs uppercase tracking-tight text-[#EFECE6]">
+              #{{ selectedItem.receipt_number || selectedItem.code }}
+            </h3>
           </div>
-          <button @click="closeDetail" class="text-slate-300 hover:text-white p-1">
-            <i class="fa-solid fa-xmark text-lg"></i>
+          <button @click="closeDetail" class="text-slate-400 hover:text-white p-1">
+            <i class="fa-solid fa-xmark text-base"></i>
           </button>
         </div>
 
-        <div class="p-5 space-y-4">
-          <!-- Breakdown -->
-          <div class="bg-slate-50 border border-slate-100 rounded-xl p-3.5 space-y-2 text-xs">
-            <div class="flex justify-between text-slate-500">
+        <div class="p-4 space-y-3">
+          <!-- Breakdown Ticket -->
+          <div class="bg-[#F8F7F4] border border-[#E8E6E1] rounded-xl p-3 space-y-1.5 text-xs">
+            <div class="flex justify-between text-slate-500 font-medium">
               <span>Category</span>
-              <span class="font-bold text-slate-800">{{ selectedItem.category_name }}</span>
+              <span class="font-bold text-[#1C2331]">{{ selectedItem.category_name }}</span>
             </div>
-            <div class="flex justify-between text-slate-500">
+            <div class="flex justify-between text-slate-500 font-medium">
               <span>Quantity</span>
-              <span class="font-bold text-slate-800">{{ selectedItem.quantity }}</span>
+              <span class="font-bold text-[#1C2331]">{{ selectedItem.quantity }} Person(s)</span>
             </div>
-            <div class="flex justify-between text-slate-500">
+            <div class="flex justify-between text-slate-500 font-medium">
               <span>MoMo Number</span>
-              <span class="font-mono font-bold text-slate-800">{{ selectedItem.momo_number }}</span>
+              <span class="font-mono font-bold text-[#1C2331]">{{ selectedItem.momo_number }}</span>
             </div>
-            <div v-if="selectedItem.customer_name" class="flex justify-between text-slate-500">
-              <span>Customer Name</span>
-              <span class="font-bold text-slate-800">{{ selectedItem.customer_name }}</span>
+            <div v-if="selectedItem.customer_name" class="flex justify-between text-slate-500 font-medium">
+              <span>Customer</span>
+              <span class="font-bold text-[#1C2331]">{{ selectedItem.customer_name }}</span>
             </div>
-            <div class="flex justify-between text-slate-500">
-              <span>Cashier</span>
-              <span class="font-bold text-slate-800">{{ selectedItem.agent_name || store.session.agentName }}</span>
+            <div class="flex justify-between text-slate-500 font-medium">
+              <span>Terminal / Cashier</span>
+              <span class="font-bold text-[#1C2331]">{{ selectedItem.terminal_id }} &bull; {{ selectedItem.agent_name }}</span>
             </div>
-            <div class="flex justify-between text-slate-500">
-              <span>Terminal</span>
-              <span class="font-bold text-slate-800">{{ selectedItem.terminal_id || store.session.terminalId }}</span>
+            <div class="flex justify-between text-slate-500 font-medium">
+              <span>Timestamp</span>
+              <span class="font-bold text-[#1C2331]">{{ selectedItem.created_at }}</span>
             </div>
-            <div class="flex justify-between text-slate-500">
-              <span>Time</span>
-              <span class="font-bold text-slate-800">{{ selectedItem.created_at }}</span>
-            </div>
-            <div class="pt-2 border-t border-slate-200 flex justify-between items-center">
-              <span class="font-bold text-slate-700">Total Paid</span>
-              <span class="font-black text-emerald-700 text-sm">{{ formatCurrency(selectedItem.total_amount) }}</span>
+            <div class="pt-2 border-t border-[#E8E6E1] flex justify-between items-center">
+              <span class="font-black text-slate-700 uppercase text-[11px]">Total Paid</span>
+              <span class="font-black text-[#1C2331] text-base">{{ formatCurrency(selectedItem.total_amount) }}</span>
             </div>
           </div>
 
           <!-- Email Dispatch Box -->
-          <div class="space-y-2">
-            <label class="block text-xs font-bold text-slate-700">
-              Push Digital E-Receipt to Email
+          <div class="space-y-1.5">
+            <label class="block text-[11px] font-black uppercase tracking-wider text-[#1C2331]">
+              Push E-Receipt to Email
             </label>
-            <div class="flex gap-2">
+            <div class="flex gap-1.5">
               <input
                 v-model="emailInput"
                 type="email"
                 placeholder="customer@example.com"
-                class="flex-1 px-3 py-2 text-xs border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
+                class="flex-1 px-3 py-2 text-xs border border-[#E8E6E1] rounded-xl focus:ring-2 focus:ring-[#9E8F70] outline-none"
               />
               <button
                 @click="sendEmail"
                 :disabled="isSendingEmail"
-                class="px-4 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-sm disabled:opacity-50 flex items-center gap-1.5 transition"
+                class="px-3.5 py-2 text-xs font-black text-[#1C2331] bg-[#9E8F70] hover:bg-[#8B7C5E] rounded-xl shadow-xs disabled:opacity-50 flex items-center gap-1.5 transition"
               >
                 <i v-if="isSendingEmail" class="fa-solid fa-spinner fa-spin"></i>
                 <i v-else class="fa-solid fa-paper-plane"></i>
                 Send
               </button>
             </div>
-            <p v-if="emailFeedback" class="text-[11px] font-semibold text-emerald-600">
+            <p v-if="emailFeedback" class="text-[10px] font-bold text-emerald-700">
               {{ emailFeedback }}
             </p>
           </div>
 
           <!-- Modal Actions -->
-          <div class="flex gap-2 pt-2">
+          <div class="flex gap-2 pt-1">
             <button
               @click="reprintItem(selectedItem)"
-              class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-sm transition"
+              class="flex-1 py-2.5 bg-[#1C2331] hover:bg-[#121722] text-white rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-xs transition"
             >
-              <i class="fa-solid fa-print"></i>
-              Reprint 58mm Thermal
+              <i class="fa-solid fa-print text-[#9E8F70]"></i>
+              58mm Print
             </button>
             <a
               :href="`/receipt/${selectedItem.receipt_number}`"
               target="_blank"
-              class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition"
+              class="px-3 py-2.5 bg-[#F8F7F4] hover:bg-slate-100 text-[#1C2331] border border-[#E8E6E1] rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition"
             >
-              <i class="fa-solid fa-arrow-up-right-from-square"></i>
-              Public Page
+              <i class="fa-solid fa-arrow-up-right-from-square text-[#9E8F70]"></i>
+              Public
             </a>
           </div>
         </div>
