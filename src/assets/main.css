@@ -11,29 +11,31 @@
   --ax-radius-full: var(--radius-full, 9999px);
 
   /* Meta Astryx Elevation & Shadows */
-  --ax-shadow-low: var(--shadow-low, 0 2px 4px rgba(0, 0, 0, 0.05));
-  --ax-shadow-med: var(--shadow-med, 0 4px 12px rgba(0, 0, 0, 0.08));
-  --ax-shadow-high: var(--shadow-high, 0 12px 24px rgba(0, 0, 0, 0.12));
-  --ax-shadow-hover: var(--shadow-inset-hover, inset 0 0 0 2px rgba(0, 116, 226, 0.3));
-  --ax-shadow-focus: var(--shadow-inset-selected, inset 0 0 0 2px #0074e2);
+  --ax-shadow-low: var(--shadow-low, 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04));
+  --ax-shadow-med: var(--shadow-med, 0 4px 12px rgba(28, 35, 49, 0.08), 0 2px 4px rgba(0, 0, 0, 0.03));
+  --ax-shadow-high: var(--shadow-high, 0 12px 28px rgba(28, 35, 49, 0.12), 0 4px 10px rgba(0, 0, 0, 0.05));
+  --ax-shadow-hover: var(--shadow-inset-hover, inset 0 0 0 2px rgba(158, 143, 112, 0.35));
+  --ax-shadow-focus: var(--shadow-inset-selected, inset 0 0 0 2px #9E8F70);
 
-  /* Brand Colors integrated with Astryx Scales */
-  --primary: #004F71;
-  --primary-dark: #00364d;
-  --primary-light: #e6f0f5;
-  --accent: #ffcc00;
-  --accent-hover: #e6b800;
+  /* Official Abja Parks Brand Colors (Extracted from Brand Logo) */
+  --primary: #1C2331;         /* Abja Dark Charcoal Slate */
+  --primary-dark: #121722;    /* Deep Midnight Slate */
+  --primary-light: #F4F2EE;   /* Soft Sand White */
+  --accent: #9E8F70;          /* Abja Sandstone Khaki / Warm Gold */
+  --accent-hover: #8B7C5E;    /* Darkened Sandstone */
+  --accent-light: #F7F5F1;    /* Light Cream Tint */
+  --accent-gold: #B5A585;     /* Highlight Gold */
 
-  --success: var(--color-success, #198100);
-  --danger: var(--color-error, #c9303a);
-  --warning: var(--color-warning, #ffce2f);
+  --success: #2E7D32;
+  --danger: #C62828;
+  --warning: #D97706;
 
-  --bg-app: var(--color-background-gray, #f8fafc);
-  --card-bg: #ffffff;
-  --text-main: var(--color-text-primary, #111111);
-  --text-muted: var(--color-text-secondary, #474747);
-  --border: var(--color-border, #00000014);
-  --border-strong: var(--color-border-emphasized, #d4d4d4);
+  --bg-app: #F8F7F4;
+  --card-bg: #FFFFFF;
+  --text-main: #1C2331;
+  --text-muted: #6B7280;
+  --border: #E8E6E1;
+  --border-strong: #D5D1C7;
 }
 
 /* Astryx Design System Utility Tokens */

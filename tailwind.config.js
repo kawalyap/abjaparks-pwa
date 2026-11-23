@@ -8,13 +8,15 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: 'var(--primary)',
-          dark: 'var(--primary-dark)',
-          light: 'var(--primary-light)',
+          DEFAULT: '#1C2331',
+          dark: '#121722',
+          light: '#F4F2EE',
         },
         accent: {
-          DEFAULT: 'var(--accent)',
-          hover: 'var(--accent-hover)',
+          DEFAULT: '#9E8F70',
+          hover: '#8B7C5E',
+          light: '#F7F5F1',
+          gold: '#B5A585',
         },
         surface: 'var(--card-bg)',
         border: 'var(--border)',
@@ -23,7 +25,7 @@ export default {
           primary: 'var(--color-text-primary)',
           secondary: 'var(--color-text-secondary)',
           border: 'var(--color-border)',
-          accent: 'var(--color-accent)',
+          accent: '#9E8F70',
         }
       },
       borderRadius: {

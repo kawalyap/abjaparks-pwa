@@ -167,9 +167,9 @@ onMounted(() => {
 
       <!-- Top KPI Cards -->
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-xs">
+        <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-xs border-t-2 border-[#9E8F70]">
           <div class="text-[10px] uppercase font-bold text-slate-400">Total Revenue</div>
-          <div class="text-lg sm:text-xl font-black text-emerald-700 mt-1">
+          <div class="text-lg sm:text-xl font-black text-[#8D7E5F] mt-1">
             {{ formatCurrency(reportData.summary.total_revenue) }}
           </div>
           <div class="text-[10px] text-slate-400 mt-0.5">Paid via MoMo / Cash</div>
@@ -223,7 +223,7 @@ onMounted(() => {
             <!-- Progress bar -->
             <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
               <div
-                class="bg-emerald-600 h-2 rounded-full transition-all duration-500"
+                class="bg-[#9E8F70] h-2 rounded-full transition-all duration-500"
                 :style="{
                   width: `${reportData.summary.total_revenue > 0 ? (cat.revenue / reportData.summary.total_revenue) * 100 : 0}%`
                 }"

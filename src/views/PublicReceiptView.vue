@@ -99,16 +99,15 @@ onMounted(() => {
     <!-- Official Verified Receipt Card -->
     <div v-else-if="receipt" class="bg-white border border-slate-200 rounded-3xl shadow-xl overflow-hidden">
       <!-- Verified Top Header -->
-      <div class="bg-gradient-to-r from-emerald-800 to-teal-900 text-white p-6 text-center relative">
-        <div class="w-12 h-12 bg-white/10 backdrop-blur-xs rounded-2xl flex items-center justify-center mx-auto mb-2 border border-white/20">
-          <i class="fa-solid fa-tree text-2xl text-amber-300"></i>
+      <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white p-6 text-center relative border-b-2 border-[#9E8F70]">
+        <div class="bg-white rounded-xl px-3 py-1.5 max-w-[170px] mx-auto mb-2 shadow-sm">
+          <img src="/abja-logo.png" alt="Abja Parks" class="h-8 mx-auto object-contain" />
         </div>
-        <h1 class="text-lg font-black tracking-tight">ABJA PARKS & RECREATION</h1>
-        <p class="text-xs text-emerald-200 font-semibold">Official Admission E-Receipt</p>
+        <p class="text-xs text-[#D4C7AC] font-bold">Official Admission E-Receipt</p>
 
         <!-- Verified badge -->
-        <div class="inline-flex items-center gap-1.5 bg-emerald-500/30 border border-emerald-400/50 px-3 py-1 rounded-full text-[11px] font-bold text-emerald-100 mt-3">
-          <i class="fa-solid fa-circle-check text-emerald-300"></i>
+        <div class="inline-flex items-center gap-1.5 bg-[#9E8F70]/25 border border-[#9E8F70]/60 px-3 py-1 rounded-full text-[11px] font-bold text-[#EFECE6] mt-3">
+          <i class="fa-solid fa-circle-check text-[#D4C7AC]"></i>
           Verified Official Payment
         </div>
       </div>

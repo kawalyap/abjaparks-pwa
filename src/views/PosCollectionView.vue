@@ -1,7 +1,7 @@
 <template>
   <div class="pos-container">
     <div class="pos-layout-wrapper">
-      <!-- Left Column / Top Section: Ticket Category Selection -->
+      <!-- Left Column: Admission Category Selection -->
       <section class="section-card category-section">
         <div class="section-header-compact">
           <div class="section-title">
@@ -42,9 +42,10 @@
           </button>
         </div>
 
-        <!-- Quantity Stepper & Chips (Visible on desktop / tablets, and quick chips on mobile) -->
+        <!-- Quantity Stepper & Quick Multipliers -->
         <div class="quantity-row">
           <div class="qty-chips-bar">
+            <span class="qty-label hidden sm:inline text-xs font-bold text-slate-500 mr-1">Qty:</span>
             <button
               v-for="q in [1, 2, 3, 5, 10]"
               :key="q"
@@ -68,12 +69,12 @@
         </div>
       </section>
 
-      <!-- Right Column / Bottom Section: Customer Phone, Numpad & Collection Action -->
+      <!-- Right Column: Customer Phone, Details & Payment Action -->
       <section class="section-card payment-section">
-        <!-- Order Total Banner (High contrast) -->
+        <!-- Order Total Banner (Abja Brand Dark Slate & Sandstone Gold) -->
         <div class="total-banner">
           <div class="total-left">
-            <span class="total-label">Total Amount</span>
+            <span class="total-label">Total to Collect</span>
             <div class="total-sub">
               {{ posStore.selectedCategory?.name || 'Ticket' }} × {{ posStore.quantity }}
             </div>
@@ -83,11 +84,13 @@
           </div>
         </div>
 
-        <!-- Mobile Money Phone Number Input -->
+        <!-- Mobile Money Phone Number Input (Triggers Native Phone Dialpad Keyboard) -->
         <div class="phone-input-group">
           <div class="input-header-row">
-            <label class="field-label-compact">Customer Phone (MoMo)</label>
-            <span v-if="carrierBadge" :class="['carrier-badge', carrierBadge.toLowerCase()]">
+            <label class="field-label-compact" for="momo-phone-input">
+              Customer Mobile Money Number
+            </label>
+            <span v-if="carrierBadge" :class="['carrier-badge', carrierBadge.toLowerCase().includes('mtn') ? 'mtn' : 'airtel']">
               {{ carrierBadge }}
             </span>
           </div>
@@ -95,22 +98,47 @@
           <div class="input-with-icon">
             <i class="fa-solid fa-phone phone-icon"></i>
             <input
+              id="momo-phone-input"
+              ref="phoneInputRef"
               type="tel"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              autocomplete="tel"
               v-model="posStore.phoneNumber"
-              placeholder="0779 123 456"
+              placeholder="07XX XXX XXX"
               class="pos-input"
               maxlength="13"
-              readonly
+              @input="onPhoneInput"
+              autofocus
             />
             <button
               v-if="posStore.phoneNumber"
+              type="button"
               class="clear-phone-btn"
-              @click="posStore.phoneNumber = ''"
+              @click="clearPhone"
               title="Clear phone number"
             >
               <i class="fa-solid fa-circle-xmark"></i>
             </button>
           </div>
+          <p class="input-hint">
+            <i class="fa-solid fa-keyboard text-slate-400 mr-1"></i>
+            Tap input to trigger phone dialpad
+          </p>
+        </div>
+
+        <!-- Quick Carrier Prefix Chips -->
+        <div class="prefix-chips-row">
+          <span class="text-[11px] font-bold text-slate-400 mr-1">Quick Prefix:</span>
+          <button
+            v-for="pref in ['077', '078', '076', '070', '075']"
+            :key="pref"
+            type="button"
+            class="prefix-chip"
+            @click="setPrefix(pref)"
+          >
+            {{ pref }}
+          </button>
         </div>
 
         <!-- Optional Collapsible Customer Details (Name / Email for E-Receipt) -->
@@ -121,16 +149,16 @@
             @click="showOptionalDetails = !showOptionalDetails"
           >
             <span>
-              <i class="fa-solid fa-envelope-open-text text-slate-400"></i>
+              <i class="fa-solid fa-envelope-open-text mr-1 text-slate-400"></i>
               {{ showOptionalDetails ? 'Hide Customer Details' : '+ Add Name / Email for E-Receipt' }}
             </span>
             <i class="fa-solid fa-chevron-down toggle-arrow" :class="{ 'rotate-180': showOptionalDetails }"></i>
           </button>
 
-          <div v-show="showOptionalDetails" class="accordion-content animate-fade-in">
-            <div class="grid grid-cols-2 gap-2 pt-2">
+          <div v-show="showOptionalDetails" class="accordion-content">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2">
               <div>
-                <label class="field-label-sm">Customer Name</label>
+                <label class="field-label-sm">Customer Name (Optional)</label>
                 <input
                   type="text"
                   v-model="posStore.customerName"
@@ -139,11 +167,11 @@
                 />
               </div>
               <div>
-                <label class="field-label-sm">Customer Email</label>
+                <label class="field-label-sm">Customer Email (for E-Receipt)</label>
                 <input
                   type="email"
                   v-model="posStore.customerEmail"
-                  placeholder="name@mail.com"
+                  placeholder="customer@example.com"
                   class="pos-input-sm"
                 />
               </div>
@@ -151,23 +179,7 @@
           </div>
         </div>
 
-        <!-- Ergonomic Mobile Touch Numpad (Big thumb-friendly buttons) -->
-        <div class="numpad-container">
-          <div class="numpad-grid">
-            <button
-              v-for="digit in ['1', '2', '3', '4', '5', '6', '7', '8', '9', '07', '0', '⌫']"
-              :key="digit"
-              type="button"
-              class="numpad-key"
-              :class="{ 'key-backspace': digit === '⌫', 'key-prefix': digit === '07' }"
-              @click="handleNumpad(digit)"
-            >
-              {{ digit }}
-            </button>
-          </div>
-        </div>
-
-        <!-- Big Primary Action Button -->
+        <!-- Big Primary Action Button (Abja Sandstone Gold) -->
         <div class="action-footer">
           <button
             class="collect-btn"
@@ -196,6 +208,7 @@ import { usePosStore } from '@/stores/usePosStore'
 
 const router = useRouter()
 const posStore = usePosStore()
+const phoneInputRef = ref<HTMLInputElement | null>(null)
 
 const showOptionalDetails = ref(false)
 
@@ -207,17 +220,28 @@ const carrierBadge = computed(() => {
   return null
 })
 
-function handleNumpad(val: string) {
-  if (val === '⌫') {
-    posStore.phoneNumber = posStore.phoneNumber.slice(0, -1)
-  } else if (val === '07') {
-    if (!posStore.phoneNumber) posStore.phoneNumber = '07'
-    else posStore.phoneNumber += '07'
+function onPhoneInput(e: Event) {
+  const input = e.target as HTMLInputElement
+  // Auto strip non-digit characters except leading +
+  let val = input.value.replace(/[^\d+]/g, '')
+  posStore.phoneNumber = val
+}
+
+function setPrefix(prefix: string) {
+  if (!posStore.phoneNumber) {
+    posStore.phoneNumber = prefix
+  } else if (posStore.phoneNumber.startsWith('0')) {
+    posStore.phoneNumber = prefix + posStore.phoneNumber.slice(3)
   } else {
-    if (posStore.phoneNumber.length < 13) {
-      posStore.phoneNumber += val
-    }
+    posStore.phoneNumber = prefix
   }
+  // Focus the phone input so the native keyboard triggers immediately
+  phoneInputRef.value?.focus()
+}
+
+function clearPhone() {
+  posStore.phoneNumber = ''
+  phoneInputRef.value?.focus()
 }
 
 async function handleCollectPayment() {
@@ -233,13 +257,17 @@ onMounted(() => {
   if (posStore.categories.length === 0) {
     posStore.loadCategories()
   }
+  // Auto-focus the phone input for instant keyboard popup on mobile
+  setTimeout(() => {
+    phoneInputRef.value?.focus()
+  }, 300)
 })
 </script>
 
 <style scoped>
 .pos-container {
-  padding: 10px 14px;
-  max-width: 1100px;
+  padding: 12px 16px;
+  max-width: 1040px;
   margin: 0 auto;
   width: 100%;
 }
@@ -253,7 +281,7 @@ onMounted(() => {
 .section-card {
   background: var(--card-bg);
   border-radius: var(--ax-radius-lg);
-  padding: 16px;
+  padding: 18px;
   box-shadow: var(--ax-shadow-low);
   border: 1px solid var(--border);
   display: flex;
@@ -277,12 +305,12 @@ onMounted(() => {
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: var(--text-main);
+  color: var(--primary);
 }
 
 .section-title i {
-  color: var(--primary);
-  font-size: 14px;
+  color: var(--accent);
+  font-size: 15px;
 }
 
 /* Categories Grid */
@@ -290,40 +318,40 @@ onMounted(() => {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .category-btn {
-  background: var(--card-bg);
-  border: 1px solid var(--border);
+  background: #ffffff;
+  border: 1.5px solid var(--border);
   border-radius: var(--ax-radius-md);
   box-shadow: var(--ax-shadow-low);
-  padding: 12px 14px;
+  padding: 14px;
   display: flex;
   align-items: center;
   gap: 10px;
   position: relative;
   text-align: left;
   transition: all var(--duration-fast, 125ms) ease;
-  min-height: 58px;
+  min-height: 64px;
 }
 
 .category-btn:hover {
-  border-color: var(--border-strong);
+  border-color: var(--accent);
   box-shadow: var(--ax-shadow-med);
 }
 
 .category-btn.active {
-  border-color: var(--primary);
-  background: var(--primary-light);
-  box-shadow: var(--ax-shadow-focus);
+  border-color: var(--accent);
+  background: var(--accent-light);
+  box-shadow: 0 0 0 2px var(--accent);
 }
 
 .cat-icon-wrap {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: var(--ax-radius-xs);
-  background: var(--bg-app);
+  background: var(--primary-light);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -344,24 +372,21 @@ onMounted(() => {
 
 .cat-name {
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--text-main);
   line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .cat-amount {
   font-size: 12px;
   font-weight: 800;
-  color: var(--primary);
-  margin-top: 2px;
+  color: #8D7E5F;
+  margin-top: 3px;
 }
 
 .cat-check {
-  color: var(--primary);
-  font-size: 16px;
+  color: var(--accent);
+  font-size: 17px;
   flex-shrink: 0;
 }
 
@@ -379,12 +404,12 @@ onMounted(() => {
 
 .chip-btn {
   flex: 1;
-  padding: 6px 0;
+  padding: 8px 0;
   background: var(--bg-app);
   border: 1px solid var(--border);
   border-radius: var(--ax-radius-full);
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 800;
   color: var(--text-muted);
   transition: all var(--duration-fast, 125ms) ease;
 }
@@ -393,24 +418,23 @@ onMounted(() => {
   background: var(--primary);
   color: #ffffff;
   border-color: var(--primary);
-  box-shadow: var(--ax-shadow-low);
+  box-shadow: 0 2px 4px rgba(28, 35, 49, 0.2);
 }
 
-.compact-qty-stepper,
-.qty-stepper-desktop {
+.compact-qty-stepper {
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
 .qty-btn-mini {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border-radius: var(--ax-radius-xs);
   background: var(--bg-app);
   border: 1px solid var(--border);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--text-main);
   display: flex;
   align-items: center;
@@ -430,12 +454,13 @@ onMounted(() => {
 
 /* Order Total Banner */
 .total-banner {
-  background: linear-gradient(135deg, #004F71 0%, #002e42 100%);
+  background: linear-gradient(135deg, #1C2331 0%, #121722 100%);
   color: #ffffff;
   border-radius: var(--ax-radius-md);
+  border: 1px solid rgba(158, 143, 112, 0.3);
   box-shadow: var(--ax-shadow-low);
-  padding: 10px 14px;
-  margin-bottom: 10px;
+  padding: 14px 18px;
+  margin-bottom: 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -447,60 +472,62 @@ onMounted(() => {
 }
 
 .total-label {
-  font-size: 10px;
+  font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  opacity: 0.8;
-  font-weight: 700;
+  letter-spacing: 0.6px;
+  color: #D4C7AC;
+  font-weight: 800;
 }
 
 .total-sub {
-  font-size: 11px;
-  opacity: 0.9;
+  font-size: 12px;
+  opacity: 0.85;
   font-weight: 600;
+  color: #ffffff;
+  margin-top: 2px;
 }
 
 .total-figure {
-  font-size: 22px;
-  font-weight: 800;
+  font-size: 24px;
+  font-weight: 900;
   letter-spacing: -0.5px;
-  color: var(--accent);
+  color: #E2D7C0;
 }
 
 /* Phone Input */
 .phone-input-group {
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .input-header-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 .field-label-compact {
   font-size: 11px;
-  font-weight: 700;
-  color: var(--text-muted);
+  font-weight: 800;
+  color: var(--primary);
   text-transform: uppercase;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.4px;
 }
 
 .carrier-badge {
   font-size: 10px;
   font-weight: 800;
-  padding: 1px 6px;
+  padding: 2px 8px;
   border-radius: var(--ax-radius-full);
 }
 
 .carrier-badge.mtn {
-  background: #ffcc00;
+  background: #FFCC00;
   color: #000000;
 }
 
 .carrier-badge.airtel {
-  background: #ef4444;
+  background: #E53935;
   color: #ffffff;
 }
 
@@ -512,37 +539,78 @@ onMounted(() => {
 
 .phone-icon {
   position: absolute;
-  left: 12px;
-  color: var(--primary);
-  font-size: 14px;
+  left: 14px;
+  color: var(--accent);
+  font-size: 16px;
 }
 
 .pos-input {
   width: 100%;
-  padding: 10px 36px 10px 34px;
-  border: 1px solid var(--border-strong);
-  border-radius: var(--ax-radius-sm);
-  background: var(--card-bg);
-  color: var(--text-main);
-  font-size: 17px;
+  padding: 14px 40px 14px 42px;
+  border: 2px solid var(--border-strong);
+  border-radius: var(--ax-radius-md);
+  background: #ffffff;
+  color: var(--primary);
+  font-size: 20px;
   font-weight: 800;
   letter-spacing: 1px;
   outline: none;
+  transition: all var(--duration-fast, 125ms) ease;
+}
+
+.pos-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(158, 143, 112, 0.25);
 }
 
 .clear-phone-btn {
   position: absolute;
-  right: 10px;
+  right: 12px;
   background: none;
   border: none;
-  color: var(--text-muted);
-  font-size: 16px;
+  color: #9CA3AF;
+  font-size: 18px;
   padding: 4px;
+}
+
+.input-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 5px;
+}
+
+/* Quick Prefix Chips */
+.prefix-chips-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.prefix-chip {
+  padding: 4px 10px;
+  background: var(--bg-app);
+  border: 1px solid var(--border);
+  border-radius: var(--ax-radius-full);
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--primary);
+  transition: all var(--duration-fast, 125ms) ease;
+}
+
+.prefix-chip:hover, .prefix-chip:active {
+  background: var(--accent-light);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 /* Optional Accordion */
 .optional-accordion {
-  margin-bottom: 8px;
+  margin-bottom: 14px;
+  background: var(--bg-app);
+  border: 1px solid var(--border);
+  border-radius: var(--ax-radius-sm);
+  padding: 8px 12px;
 }
 
 .accordion-toggle-btn {
@@ -552,9 +620,9 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 4px 2px;
+  padding: 2px 0;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--primary);
 }
 
@@ -569,64 +637,26 @@ onMounted(() => {
 
 .field-label-sm {
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--text-muted);
   display: block;
-  margin-bottom: 2px;
+  margin-bottom: 3px;
+  text-transform: uppercase;
 }
 
 .pos-input-sm {
   width: 100%;
-  padding: 6px 8px;
-  border: 1px solid var(--border);
+  padding: 8px 10px;
+  border: 1px solid var(--border-strong);
   border-radius: var(--ax-radius-xs);
-  background: var(--card-bg);
+  background: #ffffff;
   color: var(--text-main);
-  font-size: 11px;
+  font-size: 12px;
   outline: none;
 }
 
-/* Numpad */
-.numpad-container {
-  margin-bottom: 10px;
-}
-
-.numpad-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-}
-
-.numpad-key {
-  height: 48px;
-  background: var(--bg-app);
-  border: 1px solid var(--border);
-  border-radius: var(--ax-radius-sm);
-  box-shadow: var(--ax-shadow-low);
-  font-size: 18px;
-  font-weight: 800;
-  color: var(--text-main);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all var(--duration-fast, 125ms) ease;
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-.numpad-key:active {
-  background: #cbd5e1;
-  transform: scale(0.96);
-}
-
-.key-prefix {
-  font-size: 15px;
-  color: var(--primary);
-}
-
-.key-backspace {
-  color: #ef4444;
-  font-size: 16px;
+.pos-input-sm:focus {
+  border-color: var(--accent);
 }
 
 /* Action Button */
@@ -636,13 +666,14 @@ onMounted(() => {
 
 .collect-btn {
   width: 100%;
-  height: 50px;
+  height: 52px;
   background: var(--accent);
-  color: #000000;
+  color: #1C2331;
   border-radius: var(--ax-radius-md);
-  box-shadow: var(--ax-shadow-med);
-  font-size: 15px;
-  font-weight: 800;
+  box-shadow: 0 4px 12px rgba(158, 143, 112, 0.35);
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 0.3px;
   transition: all var(--duration-fast, 125ms) ease;
 }
 
@@ -655,6 +686,7 @@ onMounted(() => {
 
 .collect-btn:hover:not(:disabled) {
   background: var(--accent-hover);
+  color: #ffffff;
 }
 
 .collect-btn:active:not(:disabled) {
@@ -670,29 +702,29 @@ onMounted(() => {
 /* Mobile Handheld Responsive Optimization */
 @media (max-width: 768px) {
   .pos-container {
-    padding: 6px 8px;
+    padding: 8px 10px;
   }
   .pos-layout-wrapper {
     grid-template-columns: 1fr;
-    gap: 8px;
+    gap: 10px;
   }
   .section-card {
-    padding: 10px;
+    padding: 12px;
     border-radius: var(--ax-radius-md);
   }
   .categories-grid {
-    gap: 6px;
-    margin-bottom: 8px;
+    gap: 8px;
+    margin-bottom: 10px;
   }
   .category-btn {
-    padding: 8px 10px;
-    min-height: 50px;
+    padding: 10px;
+    min-height: 56px;
     gap: 8px;
   }
   .cat-icon-wrap {
-    width: 28px;
-    height: 28px;
-    font-size: 14px;
+    width: 32px;
+    height: 32px;
+    font-size: 15px;
   }
   .cat-name {
     font-size: 12px;
@@ -700,13 +732,13 @@ onMounted(() => {
   .cat-amount {
     font-size: 11px;
   }
-  .numpad-key {
-    height: 46px;
-    font-size: 17px;
+  .pos-input {
+    padding: 12px 36px 12px 38px;
+    font-size: 18px;
   }
   .collect-btn {
-    height: 48px;
-    font-size: 14px;
+    height: 50px;
+    font-size: 15px;
   }
 }
 </style>

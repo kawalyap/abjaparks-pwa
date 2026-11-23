@@ -4,11 +4,10 @@
       <!-- Visible Screen Receipt Card -->
       <div class="receipt-card">
         <div class="receipt-header">
-          <div class="receipt-brand-icon">
-            <i class="fa-solid fa-tree-city"></i>
+          <div class="receipt-logo-wrap">
+            <img src="/abja-logo.png" alt="Abja Parks" class="receipt-brand-logo" />
           </div>
-          <h2 class="receipt-title">ABJA PARKS</h2>
-          <p class="receipt-sub">Entrance Ticket Payment Receipt</p>
+          <p class="receipt-sub">Official Entrance Admission Receipt</p>
           <div class="status-pill">
             <i class="fa-solid fa-check"></i>
             <span>PAID & CONFIRMED</span>
@@ -283,31 +282,28 @@ function handleNextTicket() {
 }
 
 .receipt-header {
-  background: linear-gradient(135deg, #004F71 0%, #002e42 100%);
+  background: linear-gradient(135deg, #1C2331 0%, #121722 100%);
+  border-bottom: 2px solid var(--accent);
   color: #ffffff;
-  padding: 24px;
+  padding: 20px 24px;
   text-align: center;
 }
 
-.receipt-brand-icon {
-  width: 44px;
-  height: 44px;
-  background: var(--accent);
-  color: #000000;
-  border-radius: var(--ax-radius-sm);
-  display: flex;
+.receipt-logo-wrap {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
-  margin: 0 auto 10px;
-  box-shadow: var(--ax-shadow-low);
+  background: #ffffff;
+  padding: 6px 14px;
+  border-radius: var(--ax-radius-xs);
+  margin-bottom: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
-.receipt-title {
-  font-size: 20px;
-  font-weight: 800;
-  margin: 0;
-  letter-spacing: 0.5px;
+.receipt-brand-logo {
+  height: 30px;
+  width: auto;
+  object-fit: contain;
 }
 
 .receipt-sub {
@@ -435,8 +431,8 @@ function handleNextTicket() {
 
 .btn-print {
   width: 100%;
-  background: var(--primary);
-  color: #ffffff;
+  background: var(--accent);
+  color: #1C2331;
   padding: 14px;
   border-radius: var(--ax-radius-md);
   box-shadow: var(--ax-shadow-med);
@@ -450,7 +446,8 @@ function handleNextTicket() {
 }
 
 .btn-print:hover {
-  background: var(--primary-dark);
+  background: var(--accent-hover);
+  color: #ffffff;
   transform: translateY(-1px);
 }
 

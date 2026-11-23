@@ -3,14 +3,11 @@
     <!-- Top Header (Hidden on public receipt route, clean & compact on mobile) -->
     <header v-if="!isPublicReceiptRoute" class="pos-header no-print">
       <div class="header-left">
-        <div class="brand-badge">
-          <i class="fa-solid fa-tree-city"></i>
+        <!-- Official Abja Parks Brand Logo -->
+        <div class="brand-logo-container">
+          <img src="/abja-logo.png" alt="Abja Parks" class="brand-logo-img" />
         </div>
         <div class="brand-text-block">
-          <div class="brand-header-row">
-            <h1 class="brand-title">Abja Parks POS</h1>
-            <span class="meta-pill hidden sm:inline-flex">Astryx</span>
-          </div>
           <p class="brand-sub">
             <span class="terminal-badge">{{ posStore.session.terminalId }}</span>
             <span class="agent-name">• {{ posStore.session.agentName }}</span>
@@ -25,7 +22,7 @@
           @click="toggleTheme"
           :title="`Current Theme: ${currentTheme.toUpperCase()}`"
         >
-          <i class="fa-solid fa-palette text-amber-300"></i>
+          <i class="fa-solid fa-palette text-amber-200"></i>
           <span class="theme-name hidden xs:inline">{{ currentTheme }}</span>
         </button>
 
@@ -121,71 +118,54 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: var(--ax-shadow-low);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border-bottom: 2px solid var(--accent);
   position: sticky;
   top: 0;
   z-index: 100;
-  height: 52px;
+  height: 56px;
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
-.brand-badge {
-  width: 34px;
-  height: 34px;
+.brand-logo-container {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  padding: 4px 8px;
   border-radius: var(--ax-radius-xs);
-  background-color: var(--accent);
-  color: #000000;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.brand-logo-img {
+  height: 28px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.brand-text-block {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 17px;
-  font-weight: 800;
-  box-shadow: var(--ax-shadow-low);
-  flex-shrink: 0;
-}
-
-.brand-header-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.brand-title {
-  font-size: 15px;
-  font-weight: 800;
-  letter-spacing: -0.2px;
-  line-height: 1.2;
-}
-
-.meta-pill {
-  font-size: 9px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  background: rgba(255, 255, 255, 0.15);
-  color: #ffffff;
-  padding: 1px 5px;
-  border-radius: var(--ax-radius-full);
+  flex-direction: column;
 }
 
 .brand-sub {
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.8);
-  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 600;
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
 .terminal-badge {
-  font-weight: 700;
-  color: var(--accent);
+  font-weight: 800;
+  color: #D4C7AC;
+  letter-spacing: 0.3px;
 }
 
 .header-right {
@@ -237,9 +217,10 @@ onMounted(() => {
 }
 
 .nav-tab.active {
-  background-color: #ffffff;
-  color: var(--primary);
-  box-shadow: var(--ax-shadow-low);
+  background-color: var(--accent);
+  color: #1C2331;
+  font-weight: 800;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .pos-main {
@@ -257,8 +238,8 @@ onMounted(() => {
   right: 0;
   height: 56px;
   background: #ffffff;
-  border-top: 1px solid var(--border);
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.06);
+  border-top: 2px solid var(--accent);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.08);
   z-index: 100;
   padding-bottom: env(safe-area-inset-bottom);
 }
@@ -271,7 +252,7 @@ onMounted(() => {
   justify-content: center;
   gap: 2px;
   text-decoration: none;
-  color: var(--text-muted);
+  color: #6B7280;
   font-size: 10px;
   font-weight: 700;
   padding: 6px 0;
@@ -285,10 +266,11 @@ onMounted(() => {
 
 .bottom-tab.active {
   color: var(--primary);
+  font-weight: 800;
 }
 
 .bottom-tab.active i {
-  color: var(--primary);
+  color: var(--accent);
   transform: translateY(-1px);
 }
 

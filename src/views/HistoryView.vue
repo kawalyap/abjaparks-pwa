@@ -155,21 +155,21 @@ onMounted(() => {
     </div>
 
     <!-- Quick Shift Summary Banner -->
-    <div class="grid grid-cols-3 gap-2 sm:gap-3 bg-gradient-to-r from-emerald-800 to-teal-900 text-white p-3.5 rounded-xl shadow-sm">
-      <div class="border-r border-emerald-700/60 pr-2">
-        <div class="text-[10px] uppercase font-bold text-emerald-300 tracking-wider">Shift Revenue</div>
-        <div class="text-base sm:text-lg font-black tracking-tight text-amber-300">
+    <div class="grid grid-cols-3 gap-2 sm:gap-3 bg-gradient-to-r from-[#1C2331] to-[#252E40] text-white p-3.5 rounded-xl shadow-sm border-l-4 border-[#9E8F70]">
+      <div class="border-r border-slate-700/60 pr-2">
+        <div class="text-[10px] uppercase font-bold text-[#D4C7AC] tracking-wider">Shift Revenue</div>
+        <div class="text-base sm:text-lg font-black tracking-tight text-[#E2D7C0]">
           {{ formatCurrency(summaryStats.revenue) }}
         </div>
       </div>
-      <div class="border-r border-emerald-700/60 pr-2">
-        <div class="text-[10px] uppercase font-bold text-emerald-300 tracking-wider">Paid Tickets</div>
+      <div class="border-r border-slate-700/60 pr-2">
+        <div class="text-[10px] uppercase font-bold text-[#D4C7AC] tracking-wider">Paid Tickets</div>
         <div class="text-base sm:text-lg font-black tracking-tight">
           {{ summaryStats.tickets }}
         </div>
       </div>
       <div>
-        <div class="text-[10px] uppercase font-bold text-emerald-300 tracking-wider">Transactions</div>
+        <div class="text-[10px] uppercase font-bold text-[#D4C7AC] tracking-wider">Transactions</div>
         <div class="text-base sm:text-lg font-black tracking-tight">
           {{ summaryStats.count }}
         </div>
