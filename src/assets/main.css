@@ -1,0 +1,98 @@
+:root {
+  --primary: #004F71;
+  --primary-dark: #00364d;
+  --primary-light: #e6f0f5;
+  --accent: #ffcc00;
+  --accent-hover: #e6b800;
+  --success: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --bg-app: #f8fafc;
+  --card-bg: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  line-height: 1.5;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+input, button, select, textarea {
+  font-family: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: all 0.15s ease-in-out;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+/* ==========================================================================
+   Print Styles for 58mm / 80mm Thermal Receipt Printers
+   ========================================================================== */
+@media print {
+  @page {
+    margin: 0;
+    size: 58mm auto; /* Standard POS thermal roll */
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  .thermal-receipt-print-area,
+  .thermal-receipt-print-area * {
+    visibility: visible;
+  }
+
+  .thermal-receipt-print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 58mm;
+    max-width: 58mm;
+    padding: 2mm 3mm;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 11px;
+    line-height: 1.25;
+    color: #000000;
+    background: #ffffff;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}
