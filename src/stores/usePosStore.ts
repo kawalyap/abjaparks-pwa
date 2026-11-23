@@ -19,10 +19,17 @@ export const usePosStore = defineStore('pos', () => {
     loginTime: new Date().toISOString(),
   })
 
+  const DEFAULT_CATEGORIES: TicketCategory[] = [
+    { id: 'adult', name: 'Adult Entry', amount: 2000, description: 'General entrance for adults', icon: 'fa-user' },
+    { id: 'child', name: 'Child Entry', amount: 1000, description: 'Children under 12 years', icon: 'fa-child' },
+    { id: 'student', name: 'Student Entry', amount: 1500, description: 'Valid student ID required at gate', icon: 'fa-graduation-cap' },
+    { id: 'vip', name: 'VIP Entry', amount: 5000, description: 'Priority VIP gate access & seating', icon: 'fa-crown' },
+  ]
+
   // State
-  const categories = ref<TicketCategory[]>([])
+  const categories = ref<TicketCategory[]>(DEFAULT_CATEGORIES)
   const isLoadingCategories = ref(false)
-  const selectedCategory = ref<TicketCategory | null>(null)
+  const selectedCategory = ref<TicketCategory | null>(DEFAULT_CATEGORIES[0] ?? null)
   const quantity = ref<number>(1)
   const customAmount = ref<number | null>(null)
   const phoneNumber = ref<string>('')

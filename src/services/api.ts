@@ -7,7 +7,7 @@ import type {
   ShiftReportData,
 } from '@/types'
 
-const API_BASE = import.meta.env.VITE_API_URL || 'https://myparking.yoticket.click/api/v1'
+const API_BASE = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://127.0.0.1:8000/api/v1' : 'https://myparking.yoticket.click/api/v1')
 const SITE_CODE = import.meta.env.VITE_SITE_CODE || 'abjaparks'
 
 const headers = {

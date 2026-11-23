@@ -17,7 +17,7 @@
             @click="posStore.selectCategory(cat)"
           >
             <div class="cat-icon">
-              <i :class="['fa-solid', cat.icon || 'fa-ticket']"></i>
+              <i :class="['fa-solid', cat.icon ? (cat.icon.startsWith('fa-') ? cat.icon : 'fa-' + cat.icon) : 'fa-ticket']"></i>
             </div>
             <div class="cat-info">
               <div class="cat-name">{{ cat.name }}</div>
@@ -146,12 +146,18 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { usePosStore } from '@/stores/usePosStore'
 
 const router = useRouter()
 const posStore = usePosStore()
+
+onMounted(() => {
+  if (posStore.categories.length === 0) {
+    posStore.loadCategories()
+  }
+})
 
 // Carrier Detection
 const carrierBadge = computed(() => {
