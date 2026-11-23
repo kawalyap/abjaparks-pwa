@@ -1,50 +1,113 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { usePosStore } from '@/stores/usePosStore'
 
 const router = useRouter()
 const store = usePosStore()
 
-const agentName = ref(store.session.agentName || 'Gate Attendant 1')
+const agentIdentifier = ref(store.session.agentName || 'Sarah K.')
 const terminalId = ref(store.session.terminalId || 'POS-01')
 const pin = ref('')
+const isSubmitting = ref(false)
 const error = ref<string | null>(null)
+const successMessage = ref<string | null>(null)
 
-const terminals = [
-  { id: 'POS-01', name: 'Main Gate 1', icon: 'fa-door-open' },
-  { id: 'POS-02', name: 'Main Gate 2', icon: 'fa-truck-ramp-box' },
-  { id: 'POS-03', name: 'VIP Entrance', icon: 'fa-crown' },
-  { id: 'POS-04', name: 'Poolside & Garden', icon: 'fa-water-ladder' },
+// Fallback gates if network is offline
+const fallbackGates = [
+  { id: 1, code: 'POS-01', name: 'Main Gate Station 1', type: 'handheld_pos' },
+  { id: 2, code: 'POS-02', name: 'Main Gate Station 2', type: 'handheld_pos' },
+  { id: 3, code: 'POS-03', name: 'VIP Pavilion Gate', type: 'turnstile' },
+  { id: 4, code: 'POS-04', name: 'Sports Arena / Poolside', type: 'outdoor_pos' },
 ]
 
-const quickAttendants = ['Sarah K.', 'John M.', 'Grace N.', 'David O.']
+const activeGates = computed(() => {
+  return store.registeredGates.length > 0 ? store.registeredGates : fallbackGates
+})
 
-function selectTerminal(id: string) {
-  terminalId.value = id
+const selectedGate = computed(() => {
+  return activeGates.value.find(g => g.code === terminalId.value)
+})
+
+function selectTerminal(code: string) {
+  terminalId.value = code
+  error.value = null
 }
 
-function selectAttendant(name: string) {
-  agentName.value = name
+function selectAttendant(attendant: { name: string; default_gate?: string | null }) {
+  agentIdentifier.value = attendant.name
+  if (attendant.default_gate && activeGates.value.some(g => g.code === attendant.default_gate)) {
+    terminalId.value = attendant.default_gate
+  }
+  error.value = null
 }
 
-function handleLogin() {
-  if (!agentName.value.trim()) {
-    error.value = 'Please enter an attendant or cashier name'
+async function handleLogin() {
+  if (!agentIdentifier.value.trim()) {
+    error.value = 'Please select or enter an attendant name / email'
     return
   }
   if (!terminalId.value.trim()) {
-    error.value = 'Please select a terminal station'
+    error.value = 'Please select a registered gate terminal'
+    return
+  }
+  if (!pin.value.trim()) {
+    error.value = 'Please enter your 4-digit Shift PIN'
     return
   }
 
-  store.session.agentName = agentName.value.trim()
-  store.session.terminalId = terminalId.value.trim()
-  store.session.isLoggedIn = true
-  store.session.loginTime = new Date().toISOString()
+  isSubmitting.value = true
+  error.value = null
+  successMessage.value = null
 
-  router.push('/')
+  try {
+    const res = await store.loginWithBackend(
+      terminalId.value.trim(),
+      agentIdentifier.value.trim(),
+      pin.value.trim()
+    )
+
+    successMessage.value = res.message || 'Shift opened successfully!'
+    setTimeout(() => {
+      router.push('/')
+    }, 600)
+  } catch (err: any) {
+    error.value = err.message || 'Authentication failed. Please verify credentials.'
+  } finally {
+    isSubmitting.value = false
+  }
 }
+
+async function handleLogout() {
+  await store.logout()
+  pin.value = ''
+  successMessage.value = null
+}
+
+function getGateIcon(type: string): string {
+  switch (type) {
+    case 'turnstile':
+      return 'fa-person-booth'
+    case 'barrier':
+      return 'fa-road-barrier'
+    case 'outdoor_pos':
+      return 'fa-water-ladder'
+    default:
+      return 'fa-cash-register'
+  }
+}
+
+onMounted(async () => {
+  await Promise.all([
+    store.loadGates(),
+    store.loadAttendants(),
+  ])
+
+  // If store has registered gates, ensure terminalId matches one
+  if (activeGates.value.length > 0 && !activeGates.value.some(g => g.code === terminalId.value)) {
+    terminalId.value = activeGates.value[0]?.code ?? 'POS-01'
+  }
+})
 </script>
 
 <template>
@@ -55,14 +118,30 @@ function handleLogin() {
         <div class="brand-badge">
           <img src="/abja-logo.png" alt="Abja Parks" class="brand-logo" />
         </div>
-        <h1 class="header-title">POS Terminal Station</h1>
-        <p class="header-sub">Cashier Shift & Gate Register Setup</p>
+        <h1 class="header-title">Gate Terminal Register</h1>
+        <p class="header-sub">Official Attendant Authentication & Shift Login</p>
 
         <!-- Status indicator -->
         <div class="gateway-badge">
           <span class="live-dot"></span>
-          <span>YoTicket Gateway Connected</span>
+          <span>Backend Connected &bull; {{ activeGates.length }} Registered Gates</span>
         </div>
+      </div>
+
+      <!-- Active Session Notice (If Already Logged In) -->
+      <div v-if="store.session.isLoggedIn && !error" class="active-session-banner">
+        <div class="session-info">
+          <i class="fa-solid fa-circle-check session-check-icon"></i>
+          <div>
+            <div class="session-heading">Active Shift Registered</div>
+            <div class="session-details">
+              <strong>{{ store.session.agentName }}</strong> @ {{ store.session.terminalName || store.session.terminalId }}
+            </div>
+          </div>
+        </div>
+        <button type="button" @click="handleLogout" class="switch-attendant-btn">
+          Sign Out
+        </button>
       </div>
 
       <!-- Form Body -->
@@ -73,64 +152,76 @@ function handleLogin() {
           <span>{{ error }}</span>
         </div>
 
-        <!-- Terminal / Station Selector Grid -->
+        <!-- Success Alert -->
+        <div v-if="successMessage" class="success-alert">
+          <i class="fa-solid fa-circle-check shrink-0"></i>
+          <span>{{ successMessage }}</span>
+        </div>
+
+        <!-- 1. Registered Gate / Terminal Selection -->
         <div class="form-group">
           <div class="group-header">
-            <span class="field-label">Terminal Station</span>
-            <span class="selected-id">{{ terminalId }}</span>
+            <span class="field-label">1. Select Registered Gate</span>
+            <span class="selected-id">{{ selectedGate?.name || terminalId }}</span>
           </div>
+
           <div class="terminal-grid">
             <button
-              v-for="t in terminals"
-              :key="t.id"
+              v-for="gate in activeGates"
+              :key="gate.code"
               type="button"
-              @click="selectTerminal(t.id)"
+              @click="selectTerminal(gate.code)"
               class="terminal-tile"
-              :class="{ active: terminalId === t.id }"
+              :class="{ active: terminalId === gate.code }"
             >
               <div class="tile-top">
-                <i :class="['fa-solid', t.icon, 'tile-icon']"></i>
-                <span class="tile-id">{{ t.id }}</span>
+                <i :class="['fa-solid', getGateIcon(gate.type), 'tile-icon']"></i>
+                <span class="tile-id">{{ gate.code }}</span>
               </div>
-              <div class="tile-name">{{ t.name }}</div>
+              <div class="tile-name">{{ gate.name }}</div>
             </button>
           </div>
         </div>
 
-        <!-- Attendant / Cashier Name -->
+        <!-- 2. Attendant / Cashier Selection -->
         <div class="form-group">
-          <label class="field-label">Attendant / Cashier Name</label>
+          <div class="group-header">
+            <label class="field-label">2. Attendant / Cashier</label>
+            <span class="hint-text">Select name or type email</span>
+          </div>
+
+          <!-- Quick Name Chips from Backend -->
+          <div v-if="store.attendants.length > 0" class="chips-row">
+            <button
+              v-for="att in store.attendants"
+              :key="att.id"
+              type="button"
+              @click="selectAttendant(att)"
+              class="chip-tag"
+              :class="{ active: agentIdentifier === att.name || agentIdentifier === att.email }"
+            >
+              {{ att.name }}
+              <span v-if="att.default_gate" class="chip-gate-tag">{{ att.default_gate }}</span>
+            </button>
+          </div>
+
           <div class="input-wrap">
             <i class="fa-solid fa-user input-icon"></i>
             <input
-              v-model="agentName"
+              v-model="agentIdentifier"
               type="text"
               required
-              placeholder="e.g. Sarah / John"
+              placeholder="e.g. Sarah K. or sarah@abjaparks.com"
               class="text-input"
             />
           </div>
-
-          <!-- Quick Name Chips -->
-          <div class="chips-row">
-            <button
-              v-for="name in quickAttendants"
-              :key="name"
-              type="button"
-              @click="selectAttendant(name)"
-              class="chip-tag"
-              :class="{ active: agentName === name }"
-            >
-              {{ name }}
-            </button>
-          </div>
         </div>
 
-        <!-- Security PIN (Numeric Keyboard) -->
+        <!-- 3. Security PIN (Triggers Phone Numeric Keypad Directly) -->
         <div class="form-group">
           <div class="group-header">
-            <span class="field-label">Shift PIN (Optional)</span>
-            <span class="hint-text">4 Digits</span>
+            <span class="field-label">3. Shift PIN</span>
+            <span class="hint-text">Default: 1234</span>
           </div>
           <div class="input-wrap">
             <i class="fa-solid fa-shield-halved input-icon"></i>
@@ -140,6 +231,7 @@ function handleLogin() {
               inputmode="numeric"
               pattern="[0-9]*"
               maxlength="4"
+              required
               placeholder="••••"
               class="text-input pin-input"
             />
@@ -147,9 +239,10 @@ function handleLogin() {
         </div>
 
         <!-- Primary Action Button -->
-        <button type="submit" class="primary-btn">
-          <i class="fa-solid fa-arrow-right-to-bracket"></i>
-          <span>Start Shift & Open Register</span>
+        <button type="submit" :disabled="isSubmitting" class="primary-btn">
+          <i v-if="isSubmitting" class="fa-solid fa-spinner fa-spin"></i>
+          <i v-else class="fa-solid fa-arrow-right-to-bracket"></i>
+          <span>{{ isSubmitting ? 'Verifying with Backend...' : 'Authenticate & Start Shift' }}</span>
         </button>
 
         <!-- Peripheral & System Status -->
@@ -159,8 +252,8 @@ function handleLogin() {
             <span>58mm ESC/POS Ready</span>
           </span>
           <span class="status-item">
-            <i class="fa-solid fa-wifi text-online"></i>
-            <span>Cloud Sync Active</span>
+            <i class="fa-solid fa-cloud-arrow-up text-online"></i>
+            <span>YoTicket Backend Auth</span>
           </span>
         </div>
       </form>
@@ -187,7 +280,7 @@ function handleLogin() {
 .login-header {
   background: linear-gradient(180deg, #1C2331 0%, #171E2B 100%);
   color: #ffffff;
-  padding: 24px 20px;
+  padding: 22px 20px;
   text-align: center;
   border-bottom: 2px solid var(--accent, #9E8F70);
 }
@@ -197,14 +290,14 @@ function handleLogin() {
   align-items: center;
   justify-content: center;
   background: #ffffff;
-  padding: 6px 14px;
-  border-radius: 12px;
+  padding: 5px 12px;
+  border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .brand-logo {
-  height: 30px;
+  height: 28px;
   width: auto;
   object-fit: contain;
   display: block;
@@ -232,12 +325,12 @@ function handleLogin() {
   gap: 6px;
   background: rgba(158, 143, 112, 0.2);
   border: 1px solid rgba(158, 143, 112, 0.4);
-  padding: 4px 10px;
+  padding: 3px 10px;
   border-radius: 9999px;
   font-size: 10px;
   font-weight: 700;
   color: #EFECE6;
-  margin-top: 12px;
+  margin-top: 10px;
 }
 
 .live-dot {
@@ -247,21 +340,83 @@ function handleLogin() {
   background-color: #34d399;
 }
 
+/* Active Session Notice */
+.active-session-banner {
+  background: #ecfdf5;
+  border-bottom: 1px solid #a7f3d0;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.session-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.session-check-icon {
+  color: #059669;
+  font-size: 16px;
+}
+
+.session-heading {
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #065f46;
+}
+
+.session-details {
+  font-size: 11px;
+  color: #047857;
+}
+
+.switch-attendant-btn {
+  padding: 4px 10px;
+  font-size: 10px;
+  font-weight: 800;
+  color: #065f46;
+  background: #ffffff;
+  border: 1px solid #a7f3d0;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+}
+
+.switch-attendant-btn:hover {
+  background: #f0fdf4;
+}
+
 .login-body {
-  padding: 20px;
+  padding: 18px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
 
 .error-alert {
   background: #fff1f2;
   color: #be123c;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  padding: 10px 14px;
+  padding: 10px 12px;
   border-radius: 12px;
   border: 1px solid #fecdd3;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.success-alert {
+  background: #ecfdf5;
+  color: #065f46;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid #a7f3d0;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -366,6 +521,45 @@ function handleLogin() {
   line-height: 1.2;
 }
 
+.chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.chip-tag {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 4px 9px;
+  border-radius: 8px;
+  border: 1px solid var(--border, #E8E6E1);
+  background: var(--bg-app, #F8F7F4);
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+}
+
+.chip-tag:hover {
+  background: #f1f5f9;
+}
+
+.chip-tag.active {
+  background: var(--accent, #9E8F70);
+  color: #ffffff;
+  border-color: var(--accent, #9E8F70);
+}
+
+.chip-gate-tag {
+  font-size: 8px;
+  padding: 1px 3px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.12);
+  color: inherit;
+}
+
 .input-wrap {
   position: relative;
   display: flex;
@@ -403,34 +597,6 @@ function handleLogin() {
   font-family: monospace;
 }
 
-.chips-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 4px;
-}
-
-.chip-tag {
-  font-size: 10px;
-  font-weight: 800;
-  padding: 4px 10px;
-  border-radius: 8px;
-  border: 1px solid var(--border, #E8E6E1);
-  background: var(--bg-app, #F8F7F4);
-  color: #64748b;
-  transition: all 0.15s ease;
-}
-
-.chip-tag:hover {
-  background: #f1f5f9;
-}
-
-.chip-tag.active {
-  background: var(--accent, #9E8F70);
-  color: #ffffff;
-  border-color: var(--accent, #9E8F70);
-}
-
 .primary-btn {
   width: 100%;
   padding: 14px;
@@ -449,7 +615,11 @@ function handleLogin() {
   transition: all 0.15s ease;
 }
 
-.primary-btn:hover {
+.primary-btn:disabled {
+  opacity: 0.6;
+}
+
+.primary-btn:hover:not(:disabled) {
   background: #8B7C5E;
   color: #ffffff;
 }

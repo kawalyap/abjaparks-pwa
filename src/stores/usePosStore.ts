@@ -8,13 +8,20 @@ import type {
   TransactionStatusResponse,
   TransactionHistoryItem,
   AgentSession,
+  SiteGate,
+  AttendantUser,
+  AuthLoginResponse,
 } from '@/types'
 
 export const usePosStore = defineStore('pos', () => {
   // Agent & Terminal Session
   const session = useStorage<AgentSession>('abja_pos_session', {
-    agentName: 'Gate Attendant',
+    agentName: 'Sarah K.',
     terminalId: 'POS-01',
+    terminalName: 'Main Gate Station 1',
+    userEmail: 'sarah@abjaparks.com',
+    userRole: 'attendant',
+    token: '',
     isLoggedIn: true,
     loginTime: new Date().toISOString(),
   })
@@ -25,6 +32,11 @@ export const usePosStore = defineStore('pos', () => {
     { id: 'student', name: 'Student Entry', amount: 1500, description: 'Valid student ID required at gate', icon: 'fa-graduation-cap' },
     { id: 'vip', name: 'VIP Entry', amount: 5000, description: 'Priority VIP gate access & seating', icon: 'fa-crown' },
   ]
+
+  // Registered Gates & Attendants from Backend
+  const registeredGates = ref<SiteGate[]>([])
+  const attendants = ref<AttendantUser[]>([])
+  const isLoadingGates = ref(false)
 
   // State
   const categories = ref<TicketCategory[]>(DEFAULT_CATEGORIES)
@@ -73,6 +85,52 @@ export const usePosStore = defineStore('pos', () => {
     } finally {
       isLoadingCategories.value = false
     }
+  }
+
+  // Load registered gates from backend
+  async function loadGates() {
+    isLoadingGates.value = true
+    try {
+      registeredGates.value = await api.getGates()
+    } finally {
+      isLoadingGates.value = false
+    }
+  }
+
+  // Load assigned attendants from backend
+  async function loadAttendants() {
+    try {
+      attendants.value = await api.getAttendants()
+    } catch (e) {
+      console.warn('Failed to load attendants:', e)
+    }
+  }
+
+  // Authenticate attendant onto a specific registered gate
+  async function loginWithBackend(terminalId: string, identifier: string, pin: string): Promise<AuthLoginResponse> {
+    const res = await api.login({
+      terminal_id: terminalId,
+      identifier,
+      pin,
+    })
+
+    session.value.agentName = res.user.name
+    session.value.terminalId = res.gate.code
+    session.value.terminalName = res.gate.name
+    session.value.userEmail = res.user.email
+    session.value.userRole = res.user.role
+    session.value.token = res.token
+    session.value.isLoggedIn = true
+    session.value.loginTime = res.session.login_time
+
+    return res
+  }
+
+  // End shift / logout
+  async function logout() {
+    await api.logout()
+    session.value.isLoggedIn = false
+    session.value.token = ''
   }
 
   // Fast select category
@@ -183,6 +241,9 @@ export const usePosStore = defineStore('pos', () => {
 
   return {
     session,
+    registeredGates,
+    attendants,
+    isLoadingGates,
     categories,
     isLoadingCategories,
     selectedCategory,
@@ -202,6 +263,10 @@ export const usePosStore = defineStore('pos', () => {
     totalAmount,
     isFormValid,
     loadCategories,
+    loadGates,
+    loadAttendants,
+    loginWithBackend,
+    logout,
     selectCategory,
     setQuantity,
     resetForm,

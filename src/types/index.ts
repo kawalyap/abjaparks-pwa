@@ -6,6 +6,52 @@ export interface TicketCategory {
   icon: string
 }
 
+export interface SiteGate {
+  id: number
+  code: string
+  name: string
+  type: string
+  location?: string | null
+  last_active_at?: string | null
+}
+
+export interface AttendantUser {
+  id: number
+  name: string
+  email: string
+  role: string
+  default_gate?: string | null
+}
+
+export interface AuthLoginResponse {
+  success: boolean
+  message: string
+  token: string
+  user: {
+    id: number
+    name: string
+    email: string
+    role: string
+  }
+  gate: {
+    id: number
+    code: string
+    name: string
+    type: string
+    location?: string | null
+  }
+  site: {
+    code: string
+    name: string
+    currency: string
+  }
+  session: {
+    login_time: string
+    terminal_id: string
+    agent_name: string
+  }
+}
+
 export interface PaymentCollectionPayload {
   category_name: string
   amount: number
@@ -97,6 +143,10 @@ export interface ShiftReportData {
 export interface AgentSession {
   agentName: string
   terminalId: string
+  terminalName?: string
+  userEmail?: string
+  userRole?: string
+  token?: string
   isLoggedIn: boolean
   loginTime: string
 }
