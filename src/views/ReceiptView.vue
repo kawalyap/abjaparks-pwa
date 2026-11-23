@@ -276,8 +276,8 @@ function handleNextTicket() {
 
 .receipt-card {
   background: var(--card-bg);
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  border-radius: var(--ax-radius-lg);
+  box-shadow: var(--ax-shadow-high);
   border: 1px solid var(--border);
   overflow: hidden;
 }
@@ -294,12 +294,13 @@ function handleNextTicket() {
   height: 44px;
   background: var(--accent);
   color: #000000;
-  border-radius: 12px;
+  border-radius: var(--ax-radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 20px;
   margin: 0 auto 10px;
+  box-shadow: var(--ax-shadow-low);
 }
 
 .receipt-title {
@@ -404,9 +405,9 @@ function handleNextTicket() {
   display: inline-block;
   padding: 8px;
   background: #ffffff;
-  border: 1px solid #cbd5e1;
-  border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border);
+  border-radius: var(--ax-radius-sm);
+  box-shadow: var(--ax-shadow-low);
 }
 
 .qr-img {
@@ -437,17 +438,20 @@ function handleNextTicket() {
   background: var(--primary);
   color: #ffffff;
   padding: 14px;
-  border-radius: 12px;
+  border-radius: var(--ax-radius-md);
+  box-shadow: var(--ax-shadow-med);
   font-size: 15px;
   font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+  transition: all var(--duration-fast, 125ms) ease;
 }
 
 .btn-print:hover {
   background: var(--primary-dark);
+  transform: translateY(-1px);
 }
 
 .action-grid-2 {
@@ -457,30 +461,42 @@ function handleNextTicket() {
 }
 
 .btn-email {
-  background: #f1f5f9;
+  background: var(--bg-app);
   color: var(--primary);
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--border);
   padding: 12px;
-  border-radius: 10px;
+  border-radius: var(--ax-radius-sm);
   font-size: 13px;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
+  transition: all var(--duration-fast, 125ms) ease;
+}
+
+.btn-email:hover {
+  background: #e2e8f0;
 }
 
 .btn-next {
   background: var(--accent);
   color: #000000;
   padding: 12px;
-  border-radius: 10px;
+  border-radius: var(--ax-radius-sm);
+  box-shadow: var(--ax-shadow-low);
   font-size: 13px;
   font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
+  transition: all var(--duration-fast, 125ms) ease;
+}
+
+.btn-next:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
 }
 
 /* Modal */

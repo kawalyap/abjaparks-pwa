@@ -205,9 +205,9 @@ async function handleCollectPayment() {
 
 .section-card {
   background: var(--card-bg);
-  border-radius: 16px;
+  border-radius: var(--ax-radius-lg);
   padding: 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--ax-shadow-med);
   border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
@@ -238,26 +238,29 @@ async function handleCollectPayment() {
 }
 
 .category-btn {
-  background: #f8fafc;
-  border: 2px solid #e2e8f0;
-  border-radius: 14px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--ax-radius-md);
+  box-shadow: var(--ax-shadow-low);
   padding: 16px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   position: relative;
   text-align: left;
+  transition: all var(--duration-fast, 125ms) ease;
 }
 
 .category-btn:hover {
-  border-color: #cbd5e1;
-  background: #f1f5f9;
+  border-color: var(--border-strong);
+  box-shadow: var(--ax-shadow-med);
+  transform: translateY(-1px);
 }
 
 .category-btn.active {
   border-color: var(--primary);
   background: var(--primary-light);
-  box-shadow: 0 4px 12px rgba(0, 79, 113, 0.12);
+  box-shadow: var(--ax-shadow-focus);
 }
 
 .cat-icon {
@@ -315,15 +318,17 @@ async function handleCollectPayment() {
 .qty-btn {
   width: 44px;
   height: 44px;
-  border-radius: 10px;
-  background: #f1f5f9;
-  border: 1px solid #cbd5e1;
+  border-radius: var(--ax-radius-sm);
+  background: var(--bg-app);
+  border: 1px solid var(--border);
   font-size: 16px;
   font-weight: 700;
   color: var(--text-main);
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: var(--ax-shadow-low);
+  transition: all var(--duration-fast, 125ms) ease;
 }
 
 .qty-btn:disabled {
@@ -346,18 +351,20 @@ async function handleCollectPayment() {
 .chip-btn {
   flex: 1;
   padding: 6px 0;
-  background: #f8fafc;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
+  background: var(--bg-app);
+  border: 1px solid var(--border);
+  border-radius: var(--ax-radius-full);
   font-size: 12px;
   font-weight: 700;
   color: var(--text-muted);
+  transition: all var(--duration-fast, 125ms) ease;
 }
 
 .chip-btn.active {
   background: var(--primary);
   color: #ffffff;
   border-color: var(--primary);
+  box-shadow: var(--ax-shadow-low);
 }
 
 /* Payment Column */
@@ -483,16 +490,19 @@ async function handleCollectPayment() {
 
 .numpad-key {
   padding: 12px 0;
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  background: var(--bg-app);
+  border: 1px solid var(--border);
+  border-radius: var(--ax-radius-sm);
+  box-shadow: var(--ax-shadow-low);
   font-size: 18px;
   font-weight: 700;
   color: var(--text-main);
+  transition: all var(--duration-fast, 125ms) ease;
 }
 
 .numpad-key:active {
   background: #cbd5e1;
+  transform: scale(0.97);
 }
 
 /* Action Footer */
@@ -507,18 +517,20 @@ async function handleCollectPayment() {
   background: var(--accent);
   color: #000000;
   padding: 16px 20px;
-  border-radius: 12px;
+  border-radius: var(--ax-radius-md);
+  box-shadow: var(--ax-shadow-med);
   font-size: 16px;
   font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  box-shadow: 0 4px 10px rgba(255, 204, 0, 0.35);
+  transition: all var(--duration-fast, 125ms) ease;
 }
 
 .collect-btn:hover:not(:disabled) {
   background: var(--accent-hover);
+  transform: translateY(-1px);
 }
 
 .collect-btn:disabled {
@@ -529,12 +541,13 @@ async function handleCollectPayment() {
 
 .clear-btn {
   padding: 14px 16px;
-  background: #f1f5f9;
-  border: 1px solid #cbd5e1;
-  border-radius: 12px;
+  background: var(--bg-app);
+  border: 1px solid var(--border);
+  border-radius: var(--ax-radius-md);
   font-size: 13px;
   font-weight: 700;
   color: var(--text-muted);
+  transition: all var(--duration-fast, 125ms) ease;
 }
 
 @media (max-width: 860px) {
