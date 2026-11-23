@@ -69,8 +69,8 @@ export const usePosStore = defineStore('pos', () => {
   const totalAmount = computed(() => currentUnitAmount.value * quantity.value)
 
   const isFormValid = computed(() => {
-    const cleaned = phoneNumber.value.replace(/\s+/g, '')
-    const isPhoneValid = /^(0|256)?7\d{8}$/.test(cleaned)
+    const cleaned = phoneNumber.value.replace(/[\s\-\(\)]+/g, '')
+    const isPhoneValid = /^(?:\+?256|0)?7\d{8}$/.test(cleaned)
     return isPhoneValid && totalAmount.value >= 500 && !!selectedCategory.value
   })
 

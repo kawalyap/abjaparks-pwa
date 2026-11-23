@@ -129,9 +129,9 @@
 
         <!-- Quick Carrier Prefix Chips -->
         <div class="prefix-chips-row">
-          <span class="text-[11px] font-bold text-slate-400 mr-1">Quick Prefix:</span>
+          <span class="text-[11px] font-bold text-slate-400 mr-1">Prefix:</span>
           <button
-            v-for="pref in ['077', '078', '076', '070', '075']"
+            v-for="pref in ['077', '078', '076', '070', '075', '074', '+256']"
             :key="pref"
             type="button"
             class="prefix-chip"
@@ -212,28 +212,45 @@ const phoneInputRef = ref<HTMLInputElement | null>(null)
 
 const showOptionalDetails = ref(false)
 
-// Carrier Detection
+// Carrier Detection (MTN: 077, 078, 076 | Airtel: 070, 075, 074)
 const carrierBadge = computed(() => {
-  const clean = posStore.phoneNumber.replace(/\s+/g, '')
-  if (/^(0|256)?(77|78|76)/.test(clean)) return 'MTN MoMo'
-  if (/^(0|256)?(70|75|74)/.test(clean)) return 'Airtel Money'
+  const clean = posStore.phoneNumber.replace(/[\s\-\(\)]+/g, '')
+  if (/^(?:\+?256|0)?(77|78|76)/.test(clean)) return 'MTN MoMo'
+  if (/^(?:\+?256|0)?(70|75|74)/.test(clean)) return 'Airtel Money'
   return null
 })
 
 function onPhoneInput(e: Event) {
   const input = e.target as HTMLInputElement
-  // Auto strip non-digit characters except leading +
-  let val = input.value.replace(/[^\d+]/g, '')
+  // Auto strip non-digit characters except leading + and spaces
+  let val = input.value.replace(/[^\d+\s]/g, '')
   posStore.phoneNumber = val
 }
 
 function setPrefix(prefix: string) {
-  if (!posStore.phoneNumber) {
-    posStore.phoneNumber = prefix
-  } else if (posStore.phoneNumber.startsWith('0')) {
-    posStore.phoneNumber = prefix + posStore.phoneNumber.slice(3)
+  let current = posStore.phoneNumber.replace(/[\s\-\(\)]+/g, '')
+  if (prefix === '+256') {
+    if (current.startsWith('+256')) {
+      // already has international code
+    } else if (current.startsWith('0')) {
+      posStore.phoneNumber = '+256' + current.slice(1)
+    } else if (current.startsWith('256')) {
+      posStore.phoneNumber = '+' + current
+    } else {
+      posStore.phoneNumber = '+256' + current
+    }
   } else {
-    posStore.phoneNumber = prefix
+    if (!current) {
+      posStore.phoneNumber = prefix
+    } else if (current.startsWith('+256')) {
+      posStore.phoneNumber = '+256' + prefix.slice(1) + current.slice(6)
+    } else if (current.startsWith('256')) {
+      posStore.phoneNumber = '256' + prefix.slice(1) + current.slice(5)
+    } else if (current.startsWith('0')) {
+      posStore.phoneNumber = prefix + current.slice(3)
+    } else {
+      posStore.phoneNumber = prefix
+    }
   }
   // Focus the phone input so the native keyboard triggers immediately
   phoneInputRef.value?.focus()
